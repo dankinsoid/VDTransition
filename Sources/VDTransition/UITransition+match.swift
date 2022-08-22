@@ -1,10 +1,10 @@
 import SwiftUI
 
-extension UITransition where Base: Transformable & Hashable {
+extension UITransition where Base: Transformable & AnyObject {
 
     /// A transition from one view to another.
     public static func transform(to targetView: Base) -> UITransition {
-        UITransition(\Base[matching: targetView]) { progress, view, initial in
+        UITransition(TransformToModifier(targetView)) { progress, view, initial in
             let (sourceScale, sourceOffset) = transform(progress: progress, initial: initial)
             view.affineTransform = initial.sourceTransform
                 .translatedBy(x: sourceOffset.x, y: sourceOffset.y)
@@ -39,21 +39,31 @@ extension UITransition where Base: Transformable & Hashable {
     }
 }
 
-private extension Transformable {
-
-    subscript(matching view: Self) -> Matching {
-        get {
-            Matching(
-                sourceTransform: affineTransform,
-                targetTransform: view.affineTransform,
-                sourceRect: convert(bounds, to: nil),
-                targetRect: view.convert(view.bounds, to: nil)
-            )
-        }
-        nonmutating set {
-            affineTransform = newValue.sourceTransform
-            view.affineTransform = newValue.targetTransform
-        }
+private struct TransformToModifier<Root: Transformable & AnyObject>: TransitionModifier {
+    
+    public typealias Value = Matching
+    
+    weak var target: Root?
+    
+    init(_ target: Root?) {
+        self.target = target
+    }
+    
+    func matches(other: TransformToModifier<Root>) -> Bool {
+        other.target === target
+    }
+    
+    func set(value: Matching, to root: Root) {
+        root.affineTransform = value.sourceTransform
+    }
+    
+    func value(for root: Root) -> Matching {
+        Matching(
+            sourceTransform: root.affineTransform,
+            targetTransform: target?.affineTransform ?? root.affineTransform,
+            sourceRect: root.convert(root.bounds, to: nil),
+            targetRect: target?.convert(target?.bounds ?? .zero, to: nil) ?? root.convert(root.bounds, to: nil)
+        )
     }
 }
 
