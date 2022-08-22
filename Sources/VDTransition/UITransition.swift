@@ -180,4 +180,18 @@ extension UITransition {
             initialStates: initialStates
         )
     }
+    
+    public func map<T>(_ transform: @escaping (T) -> Base) -> UITransition<T> {
+        UITransition<T>(
+            transitions: transitions.map { transition in
+                UITransition<T>.Transition {
+                    transition.block($0, transform($1), $2)
+                }
+            },
+            modifiers: modifiers.map {
+                $0.map(transform).any
+            },
+            initialStates: initialStates
+        )
+    }
 }

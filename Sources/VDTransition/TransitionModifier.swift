@@ -27,6 +27,17 @@ public struct KeyPathModifier<Root, Value>: TransitionModifier {
     }
 }
 
+extension TransitionModifier {
+    
+    public var any: AnyTransitionModifier<Root> {
+        AnyTransitionModifier(self)
+    }
+    
+    public func map<T>(_ transform: @escaping (T) -> Root) -> MapTransitionModifier<Self, T> {
+        MapTransitionModifier(base: self, transform: transform)
+    }
+}
+
 public struct AnyTransitionModifier<Root>: TransitionModifier {
     
     private let isMatch: (AnyTransitionModifier) -> Bool
@@ -56,5 +67,30 @@ public struct AnyTransitionModifier<Root>: TransitionModifier {
     
     public func value(for root: Root) -> Any {
         getter(root)
+    }
+}
+
+public struct MapTransitionModifier<Base: TransitionModifier, Root>: TransitionModifier {
+    
+    public typealias Value = Base.Value
+    
+    private let base: Base
+    private let map: (Root) -> Base.Root
+    
+    public init(base: Base, transform: @escaping (Root) -> Base.Root) {
+        self.base = base
+        self.map = transform
+    }
+    
+    public func matches(other: MapTransitionModifier<Base, Root>) -> Bool {
+        base.matches(other: other.base)
+    }
+    
+    public func set(value: Base.Value, to root: Root) {
+        base.set(value: value, to: map(root))
+    }
+    
+    public func value(for root: Root) -> Base.Value {
+        base.value(for: map(root))
     }
 }

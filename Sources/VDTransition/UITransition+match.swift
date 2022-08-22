@@ -1,24 +1,18 @@
-#if canImport(UIKit)
-import UIKit
+import SwiftUI
 
-extension UITransition where Base == UIView {
+extension UITransition where Base: Transformable & Hashable {
 
     /// A transition from one view to another.
-    public static func turn(to targetView: UIView) -> UITransition {
-        UITransition(\.[matching: targetView]) { progress, view, initial in
+    public static func transform(to targetView: Base) -> UITransition {
+        UITransition(\Base[matching: targetView]) { progress, view, initial in
             let (sourceScale, sourceOffset) = transform(progress: progress, initial: initial)
-            view.transform = initial.sourceTransform
+            view.affineTransform = initial.sourceTransform
                 .translatedBy(x: sourceOffset.x, y: sourceOffset.y)
                 .scaledBy(x: sourceScale.width, y: sourceScale.height)
-
-            let (targetScale, targetOffset) = transform(progress: progress.reversed, initial: initial)
-            targetView.transform = initial.targetTransform
-                .translatedBy(x: -targetOffset.x, y: -targetOffset.y)
-                .scaledBy(x: 1 / targetScale.width.notZero, y: 1 / targetScale.height.notZero)
         }
     }
     
-    private static func transform(progress: Progress, initial: UIView.Matching) -> (scale: CGSize, offset: CGPoint) {
+    private static func transform(progress: Progress, initial: Matching) -> (scale: CGSize, offset: CGPoint) {
         let scale = CGSize(
             width: progress.value(
                 identity: 1,
@@ -45,34 +39,33 @@ extension UITransition where Base == UIView {
     }
 }
 
-private extension UIView {
+private extension Transformable {
 
-    subscript(matching view: UIView) -> Matching {
+    subscript(matching view: Self) -> Matching {
         get {
             Matching(
-                sourceTransform: transform,
-                targetTransform: view.transform,
-                sourceRect: convert(bounds, to: window),
-                targetRect: view.convert(view.bounds, to: view.window)
+                sourceTransform: affineTransform,
+                targetTransform: view.affineTransform,
+                sourceRect: convert(bounds, to: nil),
+                targetRect: view.convert(view.bounds, to: nil)
             )
         }
-        set {
-            transform = newValue.sourceTransform
-            view.transform = newValue.targetTransform
+        nonmutating set {
+            affineTransform = newValue.sourceTransform
+            view.affineTransform = newValue.targetTransform
         }
     }
+}
 
-    struct Matching {
-        
-        var sourceTransform: CGAffineTransform
-        var targetTransform: CGAffineTransform
-        var sourceRect: CGRect
-        var targetRect: CGRect
-    }
+private struct Matching {
+    
+    var sourceTransform: CGAffineTransform
+    var targetTransform: CGAffineTransform
+    var sourceRect: CGRect
+    var targetRect: CGRect
 }
 
 private extension CGFloat {
     
     var notZero: CGFloat { self == 0 ? 0.0001 : self }
 }
-#endif

@@ -16,6 +16,7 @@ public protocol Transformable {
     var anchorPoint: CGPoint { get nonmutating set }
     var affineTransform: CGAffineTransform { get nonmutating set }
     var isLtrDirection: Bool { get }
+    func convert(_ frame: CGRect, to: Self?) -> CGRect
 }
 
 #if canImport(UIKit)
