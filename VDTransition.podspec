@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'VDTransition'
-  s.version          = '1.0.1'
+  s.version          = '1.1.0'
   s.summary          = 'A short description of VDTransition.'
   s.description      = <<-DESC
 TODO: Add long description of the pod here.
@@ -23,5 +23,4 @@ TODO: Add long description of the pod here.
   s.osx.deployment_target = '10.15'
   s.swift_versions = '5.6'
   s.source_files = 'Sources/VDTransition/**/*'
-  s.frameworks = 'UIKit'
 end
