@@ -138,23 +138,23 @@ extension UITransition where Base: Transformable {
             switch (edge, view.isLtrDirection) {
             case (.leading, true), (.trailing, false):
                 view.affineTransform = affineTransform.translatedBy(
-                    x: progress.value(identity: 0, transformed: -offset.value(for: view.frame.width) - view.frame.width),
+                    x: progress.value(identity: 0, transformed: -offset.value(for: view.frame.width)),
                     y: 0
                 )
             case (.leading, false), (.trailing, true):
                 view.affineTransform = affineTransform.translatedBy(
-                    x: progress.value(identity: 0, transformed: offset.value(for: view.frame.width) + view.frame.width),
+                    x: progress.value(identity: 0, transformed: offset.value(for: view.frame.width)),
                     y: 0
                 )
             case (.top, _):
                 view.affineTransform = affineTransform.translatedBy(
                     x: 0,
-                    y: progress.value(identity: 0, transformed: -offset.value(for: view.frame.height) - view.frame.height)
+                    y: progress.value(identity: 0, transformed: -offset.value(for: view.frame.height))
                 )
             case (.bottom, _):
                 view.affineTransform = affineTransform.translatedBy(
                     x: 0,
-                    y: progress.value(identity: 0, transformed: offset.value(for: view.frame.height) + view.frame.height)
+                    y: progress.value(identity: 0, transformed: offset.value(for: view.frame.height))
                 )
             }
         }
