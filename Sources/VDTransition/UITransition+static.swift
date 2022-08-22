@@ -120,8 +120,11 @@ extension UITransition where Base: Transformable {
     }
 
     public static func offset(_ point: CGPoint) -> UITransition {
-        UITransition(\.affineTransform) { _, view, affineTransform in
-            view.affineTransform = affineTransform.translatedBy(x: point.x, y: point.y)
+        UITransition(\.affineTransform) { progress, view, affineTransform in
+            view.affineTransform = affineTransform.translatedBy(
+                x: progress.value(identity: 0, transformed: point.x),
+                y: progress.value(identity: 0, transformed: point.y)
+            )
         }
     }
 
@@ -135,23 +138,23 @@ extension UITransition where Base: Transformable {
             switch (edge, view.isLtrDirection) {
             case (.leading, true), (.trailing, false):
                 view.affineTransform = affineTransform.translatedBy(
-                    x: progress.value(identity: 0, transformed: -offset.value(for: view.frame.width)),
+                    x: progress.value(identity: 0, transformed: -offset.value(for: view.frame.width) - view.frame.width),
                     y: 0
                 )
             case (.leading, false), (.trailing, true):
                 view.affineTransform = affineTransform.translatedBy(
-                    x: progress.value(identity: 0, transformed: offset.value(for: view.frame.width)),
+                    x: progress.value(identity: 0, transformed: offset.value(for: view.frame.width) + view.frame.width),
                     y: 0
                 )
             case (.top, _):
                 view.affineTransform = affineTransform.translatedBy(
                     x: 0,
-                    y: progress.value(identity: 0, transformed: -offset.value(for: view.frame.height))
+                    y: progress.value(identity: 0, transformed: -offset.value(for: view.frame.height) - view.frame.height)
                 )
             case (.bottom, _):
                 view.affineTransform = affineTransform.translatedBy(
                     x: 0,
-                    y: progress.value(identity: 0, transformed: offset.value(for: view.frame.height))
+                    y: progress.value(identity: 0, transformed: offset.value(for: view.frame.height) + view.frame.height)
                 )
             }
         }
