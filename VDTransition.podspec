@@ -7,7 +7,7 @@
 #
 
 Pod::Spec.new do |s|
-  s.name             = 'VDTransition`
+  s.name             = 'VDTransition'
   s.version          = '1.0.0'
   s.summary          = 'A short description of VDTransition.'
   s.description      = <<-DESC
@@ -20,6 +20,7 @@ TODO: Add long description of the pod here.
   s.source           = { :git => 'https://github.com/dankinsoid/VDTransition.git', :tag => s.version.to_s }
 
   s.ios.deployment_target = '13.0'
+  s.osx.deployment_target = '10.15'
   s.swift_versions = '5.6'
   s.source_files = 'Sources/VDTransition/**/*'
   s.frameworks = 'UIKit'
