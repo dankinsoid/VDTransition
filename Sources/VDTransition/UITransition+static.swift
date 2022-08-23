@@ -84,7 +84,7 @@ extension UITransition where Base: Transformable {
         .scale(CGPoint(x: scale, y: scale))
     }
 
-    public static func scale(_ scale: CGPoint, anchor: CGPoint) -> UITransition {
+    public static func scale(_ scale: CGPoint, anchor: UnitPoint) -> UITransition {
         UITransition(\.affineTransform) { progress, view, transform in
             let scaleX = scale.x != 0 ? scale.x : 0.0001
             let scaleY = scale.y != 0 ? scale.y : 0.0001
@@ -103,13 +103,13 @@ extension UITransition where Base: Transformable {
         }
     }
 
-    public static func scale(_ scale: CGFloat = 0.0001, anchor: CGPoint) -> UITransition {
+    public static func scale(_ scale: CGFloat = 0.0001, anchor: UnitPoint) -> UITransition {
         .scale(CGPoint(x: scale, y: scale), anchor: anchor)
     }
 
     public static var scale: UITransition { .scale(0.0001) }
 
-    public static func anchor(point: CGPoint) -> UITransition {
+    public static func anchor(point: UnitPoint) -> UITransition {
         UITransition(\.anchorPoint) { progress, view, anchor in
             let anchorPoint = CGPoint(
                 x: progress.value(identity: anchor.x, transformed: point.x),
