@@ -1,4 +1,0 @@
-module VDTransition {
-    header "/Users/danil/VDTransition/.build/arm64-apple-macosx/debug/VDTransition.build/VDTransition-Swift.h"
-    requires objc
-}
