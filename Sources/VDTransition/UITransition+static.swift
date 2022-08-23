@@ -86,6 +86,7 @@ extension UITransition where Base: Transformable {
 
     public static func scale(_ scale: CGPoint, anchor: UnitPoint) -> UITransition {
         UITransition(\.affineTransform) { progress, view, transform in
+            let anchor = view.isLtrDirection ? anchor : UnitPoint(x: 1 - anchor.x, y: anchor.y)
             let scaleX = scale.x != 0 ? scale.x : 0.0001
             let scaleY = scale.y != 0 ? scale.y : 0.0001
             let xPadding = 1 / scaleX * (anchor.x - view.anchorPoint.x) * view.bounds.width
@@ -111,6 +112,7 @@ extension UITransition where Base: Transformable {
 
     public static func anchor(point: UnitPoint) -> UITransition {
         UITransition(\.anchorPoint) { progress, view, anchor in
+            let point = view.isLtrDirection ? point : UnitPoint(x: 1 - point.x, y: point.y)
             let anchorPoint = CGPoint(
                 x: progress.value(identity: anchor.x, transformed: point.x),
                 y: progress.value(identity: anchor.y, transformed: point.y)
