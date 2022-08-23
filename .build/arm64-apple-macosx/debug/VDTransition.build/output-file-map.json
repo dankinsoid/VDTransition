@@ -1,0 +1,77 @@
+{
+  "": {
+    "swift-dependencies": "/Users/danil/VDTransition/.build/arm64-apple-macosx/debug/VDTransition.build/master.swiftdeps"
+  },
+  "/Users/danil/VDTransition/Sources/VDTransition/RelationValue.swift": {
+    "dependencies": "/Users/danil/VDTransition/.build/arm64-apple-macosx/debug/VDTransition.build/RelationValue.d",
+    "object": "/Users/danil/VDTransition/.build/arm64-apple-macosx/debug/VDTransition.build/RelationValue.swift.o",
+    "swiftmodule": "/Users/danil/VDTransition/.build/arm64-apple-macosx/debug/VDTransition.build/RelationValue~partial.swiftmodule",
+    "swift-dependencies": "/Users/danil/VDTransition/.build/arm64-apple-macosx/debug/VDTransition.build/RelationValue.swiftdeps"
+  },
+  "/Users/danil/VDTransition/Sources/VDTransition/Transition+Color.swift": {
+    "dependencies": "/Users/danil/VDTransition/.build/arm64-apple-macosx/debug/VDTransition.build/Transition+Color.d",
+    "object": "/Users/danil/VDTransition/.build/arm64-apple-macosx/debug/VDTransition.build/Transition+Color.swift.o",
+    "swiftmodule": "/Users/danil/VDTransition/.build/arm64-apple-macosx/debug/VDTransition.build/Transition+Color~partial.swiftmodule",
+    "swift-dependencies": "/Users/danil/VDTransition/.build/arm64-apple-macosx/debug/VDTransition.build/Transition+Color.swiftdeps"
+  },
+  "/Users/danil/VDTransition/Sources/VDTransition/TransitionDirection.swift": {
+    "dependencies": "/Users/danil/VDTransition/.build/arm64-apple-macosx/debug/VDTransition.build/TransitionDirection.d",
+    "object": "/Users/danil/VDTransition/.build/arm64-apple-macosx/debug/VDTransition.build/TransitionDirection.swift.o",
+    "swiftmodule": "/Users/danil/VDTransition/.build/arm64-apple-macosx/debug/VDTransition.build/TransitionDirection~partial.swiftmodule",
+    "swift-dependencies": "/Users/danil/VDTransition/.build/arm64-apple-macosx/debug/VDTransition.build/TransitionDirection.swiftdeps"
+  },
+  "/Users/danil/VDTransition/Sources/VDTransition/TransitionModifier.swift": {
+    "dependencies": "/Users/danil/VDTransition/.build/arm64-apple-macosx/debug/VDTransition.build/TransitionModifier.d",
+    "object": "/Users/danil/VDTransition/.build/arm64-apple-macosx/debug/VDTransition.build/TransitionModifier.swift.o",
+    "swiftmodule": "/Users/danil/VDTransition/.build/arm64-apple-macosx/debug/VDTransition.build/TransitionModifier~partial.swiftmodule",
+    "swift-dependencies": "/Users/danil/VDTransition/.build/arm64-apple-macosx/debug/VDTransition.build/TransitionModifier.swiftdeps"
+  },
+  "/Users/danil/VDTransition/Sources/VDTransition/UIKitAnimation.swift": {
+    "dependencies": "/Users/danil/VDTransition/.build/arm64-apple-macosx/debug/VDTransition.build/UIKitAnimation.d",
+    "object": "/Users/danil/VDTransition/.build/arm64-apple-macosx/debug/VDTransition.build/UIKitAnimation.swift.o",
+    "swiftmodule": "/Users/danil/VDTransition/.build/arm64-apple-macosx/debug/VDTransition.build/UIKitAnimation~partial.swiftmodule",
+    "swift-dependencies": "/Users/danil/VDTransition/.build/arm64-apple-macosx/debug/VDTransition.build/UIKitAnimation.swiftdeps"
+  },
+  "/Users/danil/VDTransition/Sources/VDTransition/UITransition+UIStackView.swift": {
+    "dependencies": "/Users/danil/VDTransition/.build/arm64-apple-macosx/debug/VDTransition.build/UITransition+UIStackView.d",
+    "object": "/Users/danil/VDTransition/.build/arm64-apple-macosx/debug/VDTransition.build/UITransition+UIStackView.swift.o",
+    "swiftmodule": "/Users/danil/VDTransition/.build/arm64-apple-macosx/debug/VDTransition.build/UITransition+UIStackView~partial.swiftmodule",
+    "swift-dependencies": "/Users/danil/VDTransition/.build/arm64-apple-macosx/debug/VDTransition.build/UITransition+UIStackView.swiftdeps"
+  },
+  "/Users/danil/VDTransition/Sources/VDTransition/UITransition+UIView.swift": {
+    "dependencies": "/Users/danil/VDTransition/.build/arm64-apple-macosx/debug/VDTransition.build/UITransition+UIView.d",
+    "object": "/Users/danil/VDTransition/.build/arm64-apple-macosx/debug/VDTransition.build/UITransition+UIView.swift.o",
+    "swiftmodule": "/Users/danil/VDTransition/.build/arm64-apple-macosx/debug/VDTransition.build/UITransition+UIView~partial.swiftmodule",
+    "swift-dependencies": "/Users/danil/VDTransition/.build/arm64-apple-macosx/debug/VDTransition.build/UITransition+UIView.swiftdeps"
+  },
+  "/Users/danil/VDTransition/Sources/VDTransition/UITransition+match.swift": {
+    "dependencies": "/Users/danil/VDTransition/.build/arm64-apple-macosx/debug/VDTransition.build/UITransition+match.d",
+    "object": "/Users/danil/VDTransition/.build/arm64-apple-macosx/debug/VDTransition.build/UITransition+match.swift.o",
+    "swiftmodule": "/Users/danil/VDTransition/.build/arm64-apple-macosx/debug/VDTransition.build/UITransition+match~partial.swiftmodule",
+    "swift-dependencies": "/Users/danil/VDTransition/.build/arm64-apple-macosx/debug/VDTransition.build/UITransition+match.swiftdeps"
+  },
+  "/Users/danil/VDTransition/Sources/VDTransition/UITransition+static.swift": {
+    "dependencies": "/Users/danil/VDTransition/.build/arm64-apple-macosx/debug/VDTransition.build/UITransition+static.d",
+    "object": "/Users/danil/VDTransition/.build/arm64-apple-macosx/debug/VDTransition.build/UITransition+static.swift.o",
+    "swiftmodule": "/Users/danil/VDTransition/.build/arm64-apple-macosx/debug/VDTransition.build/UITransition+static~partial.swiftmodule",
+    "swift-dependencies": "/Users/danil/VDTransition/.build/arm64-apple-macosx/debug/VDTransition.build/UITransition+static.swiftdeps"
+  },
+  "/Users/danil/VDTransition/Sources/VDTransition/UITransition.swift": {
+    "dependencies": "/Users/danil/VDTransition/.build/arm64-apple-macosx/debug/VDTransition.build/UITransition.d",
+    "object": "/Users/danil/VDTransition/.build/arm64-apple-macosx/debug/VDTransition.build/UITransition.swift.o",
+    "swiftmodule": "/Users/danil/VDTransition/.build/arm64-apple-macosx/debug/VDTransition.build/UITransition~partial.swiftmodule",
+    "swift-dependencies": "/Users/danil/VDTransition/.build/arm64-apple-macosx/debug/VDTransition.build/UITransition.swiftdeps"
+  },
+  "/Users/danil/VDTransition/Sources/VDTransition/UITransitionProgress.swift": {
+    "dependencies": "/Users/danil/VDTransition/.build/arm64-apple-macosx/debug/VDTransition.build/UITransitionProgress.d",
+    "object": "/Users/danil/VDTransition/.build/arm64-apple-macosx/debug/VDTransition.build/UITransitionProgress.swift.o",
+    "swiftmodule": "/Users/danil/VDTransition/.build/arm64-apple-macosx/debug/VDTransition.build/UITransitionProgress~partial.swiftmodule",
+    "swift-dependencies": "/Users/danil/VDTransition/.build/arm64-apple-macosx/debug/VDTransition.build/UITransitionProgress.swiftdeps"
+  },
+  "/Users/danil/VDTransition/Sources/VDTransition/ViewConvertible.swift": {
+    "dependencies": "/Users/danil/VDTransition/.build/arm64-apple-macosx/debug/VDTransition.build/ViewConvertible.d",
+    "object": "/Users/danil/VDTransition/.build/arm64-apple-macosx/debug/VDTransition.build/ViewConvertible.swift.o",
+    "swiftmodule": "/Users/danil/VDTransition/.build/arm64-apple-macosx/debug/VDTransition.build/ViewConvertible~partial.swiftmodule",
+    "swift-dependencies": "/Users/danil/VDTransition/.build/arm64-apple-macosx/debug/VDTransition.build/ViewConvertible.swiftdeps"
+  }
+}

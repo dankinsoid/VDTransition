@@ -5,6 +5,36 @@ public typealias UIViewTransition = UITransition<UIView>
 
 extension UIView {
 
+    /// Animate view with given transition.
+    ///
+    /// - Parameters:
+    ///   - transition: Transition.
+    ///   - direction: Transition direction.
+    ///   - animation: Animation parameters.
+    ///   - restoreState: Restore view state on animation completion
+    ///   - completion: Block to be executed when animation finishes.
+    public func animate(
+        transition: UIViewTransition,
+        direction: TransitionDirection = .removal,
+        animation: UIKitAnimation = .default,
+        restoreState: Bool = true,
+        completion: (() -> Void)? = nil
+    ) {
+        var transition = transition
+        UIView.performWithoutAnimation {
+            transition.beforeTransition(view: self)
+            transition.update(progress: direction.at(.start), view: self)
+        }
+        UIView.animate(with: animation) { [self] in
+            transition.update(progress: direction.at(.end), view: self)
+        } completion: { [self] _ in
+            completion?()
+            if restoreState {
+                transition.setInitialState(view: self)
+            }
+        }
+    }
+
     /// Animated change `isHidden` property with given transition.
     ///
     /// - Parameters:

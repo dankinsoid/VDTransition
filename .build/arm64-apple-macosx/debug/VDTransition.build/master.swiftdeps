@@ -1,0 +1,17 @@
+version: "Apple Swift version 5.6.1 (swiftlang-5.6.0.323.66 clang-1316.0.20.12)"
+options: "8f91f5c080ee05dfa082fbbdc06113a444cc9a4781f02ab54a8aa8fd08142ceb"
+build_start_time: [1661291469, 914180040]
+build_end_time: [1661291475, 648859024]
+inputs:
+  "/Users/danil/VDTransition/Sources/VDTransition/RelationValue.swift": [1660837156, 436041831]
+  "/Users/danil/VDTransition/Sources/VDTransition/Transition+Color.swift": [1661164506, 569507122]
+  "/Users/danil/VDTransition/Sources/VDTransition/TransitionDirection.swift": [1661164196, 683976650]
+  "/Users/danil/VDTransition/Sources/VDTransition/TransitionModifier.swift": [1661178193, 737221240]
+  "/Users/danil/VDTransition/Sources/VDTransition/UIKitAnimation.swift": [1661166697, 828609943]
+  "/Users/danil/VDTransition/Sources/VDTransition/UITransition+UIStackView.swift": [1661166697, 848014593]
+  "/Users/danil/VDTransition/Sources/VDTransition/UITransition+UIView.swift": [1661291469, 137055397]
+  "/Users/danil/VDTransition/Sources/VDTransition/UITransition+match.swift": [1661179550, 52547931]
+  "/Users/danil/VDTransition/Sources/VDTransition/UITransition+static.swift": [1661248025, 453188896]
+  "/Users/danil/VDTransition/Sources/VDTransition/UITransition.swift": [1661178197, 90108633]
+  "/Users/danil/VDTransition/Sources/VDTransition/UITransitionProgress.swift": [1661165548, 149746417]
+  "/Users/danil/VDTransition/Sources/VDTransition/ViewConvertible.swift": [1661249097, 570979833]

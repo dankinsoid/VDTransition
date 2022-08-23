@@ -50,6 +50,21 @@ public struct UIKitAnimation: ExpressibleByArrayLiteral {
         UIKitAnimation(duration: duration, delay: delay, options: options)
     }
 
+    /// Repeat animation
+    ///
+    /// - Parameters:
+    ///   - duration: Animation duration in seconds.
+    ///   - delay: Animation delay in seconds.
+    ///   - options: Animation options mask.
+    /// - Returns: `UIKitAnimation`
+    public static func `repeat`(
+        _ duration: Double = UIKitAnimation.defaultDuration,
+        delay: Double = 0,
+        options: Options = [.curveEaseInOut, .autoreverse]
+    ) -> UIKitAnimation {
+        UIKitAnimation(duration: duration, delay: delay, options: options.intersection(.repeat))
+    }
+    
     /// Spring animation
     ///
     /// - Parameters:
