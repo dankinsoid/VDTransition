@@ -33,7 +33,7 @@ extension UIView: Transformable {
     }
     
     public var isLtrDirection: Bool {
-        effectiveUserInterfaceLayoutDirection == .leftToRight
+        UIView.userInterfaceLayoutDirection(for: semanticContentAttribute) == .leftToRight
     }
 }
 #endif
