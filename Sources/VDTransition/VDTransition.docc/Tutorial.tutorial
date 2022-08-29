@@ -1,16 +1,53 @@
 @Tutorial(time: 5) {
-    @Intro(title: "Animating transition") {
+    @Intro(title: "Example") {
         This tutorial guides you through building custom view transition.
     }
     
     @Section(title: "Creating transtion with built-in methods") {
         
+        @ContentAndMedia {
+            Create and configure an Xcode project that uses SlothCreator.
+            
+        }
+        
         @Steps {
+            
             @Step {
-                Create an example view
+                Create an example view in storyboard
                 
-                @Code(name: "step-1.swift", file: 01-creating-code-02-01.swift) {
-                    @Image(source: step-1.png, alt: "A screenshot from the simulator")
+                @Image(source: step-0-xib.png, alt: "Storyboard")
+            }
+            
+            @Step {
+                Write the code, create outlets
+                
+                @Code(name: "step-1.swift", file: step-1.swift) {
+                    @Image(source: step-1-screen.png, alt: "A screenshot from the simulator")
+                }
+            }
+            
+            @Step {
+                Hide second view by moving it to the trailing edge
+                
+                @Code(name: "step-2.swift", file: step-2.swift) {
+                    @Video(source: "step-2.mov")
+                }
+            }
+            
+            @Step {
+                Combine a few transitions in one via array literal `[]` and configure animation parameters
+                
+                @Code(name: "step-3.swift", file: step-3.swift) {
+                    
+                    @Video(source: "step-3.mov")
+                }
+            }
+            
+            @Step {
+                Show the view with spring animation
+                
+                @Code(name: "step-4.swift", file: step-4.swift) {
+                    @Video(source: "step-4.mov")
                 }
             }
         }

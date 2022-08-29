@@ -1,0 +1,11 @@
+@Tutorials(name: "Introduce") {
+    
+    @Intro(title: "Meet VDTransition") {
+    }
+    
+    @Chapter(name: "VDTranstion") {
+       
+        @Image(source: step-1-screen.png, alt: "A screenshot from the simulator") 
+        @TutorialReference(tutorial: "doc:Tutorial")
+    }
+}
