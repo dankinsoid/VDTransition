@@ -1,0 +1,18 @@
+@Tutorial(time: 5) {
+    @Intro(title: "Animating transition") {
+        This tutorial guides you through building custom view transition.
+    }
+    
+    @Section(title: "Creating transtion with built-in methods") {
+        
+        @Steps {
+            @Step {
+                Create an example view
+                
+                @Code(name: "step-1.swift", file: 01-creating-code-02-01.swift) {
+                    @Image(source: step-1.png, alt: "A screenshot from the simulator")
+                }
+            }
+        }
+    }
+}
