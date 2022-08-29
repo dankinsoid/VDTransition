@@ -1,14 +1,5 @@
 import SwiftUI
 
-public protocol ViewConvertible {
-    #if canImport(UIKit)
-    var asView: UIView { get }
-    #endif
-    #if canImport(Cocoa)
-    var asView: NSView { get }
-    #endif
-}
-
 public protocol Transformable {
     
     var frame: CGRect { get nonmutating set }
