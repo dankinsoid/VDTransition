@@ -9,7 +9,8 @@
 
 VDTransition provides easy way to describe view transitions.
 
-## [Tutorial](https://dankinsoid.github.io/VDTransition/tutorials/vdtransition/tutorial)
+- [Documantaion](https://dankinsoid.github.io/VDTransition/documentation/vdtransition)
+- [Tutorial](https://dankinsoid.github.io/VDTransition/tutorials/vdtransition/tutorial)
 
 ## Example
 ```swift 
