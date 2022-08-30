@@ -29,12 +29,14 @@ jobs:
     runs-on: macos-latest
     steps:
       - name: Swift Package Documentation Generator
-        uses: sersoft-gmbh/swifty-docs-action@v2.0.2
-        with:
-          transform-for-static-hosting: true
-          hosting-base-path: VDTransition
-          targets: VDTransition
-          output: doccs
+      - uses: dastrobu/setup-swift-docc@v0
+      - run: docc convert
+          DemoSwiftPackage/Sources/DemoSwiftPackage/DemoSwiftPackage.docc
+          --fallback-display-name DemoSwiftPackage
+          --fallback-bundle-identifier DemoSwiftPackage
+          --fallback-bundle-version 1
+          --additional-symbol-graph-dir DemoSwiftPackage/.build
+          --output-path doccs
       - name: Checkout
         uses: actions/checkout@v3
       - name: Setup Pages
