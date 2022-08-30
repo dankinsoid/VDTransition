@@ -28,6 +28,13 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: macos-latest
     steps:
+      - name: Swift Package Documentation Generator
+        uses: sersoft-gmbh/swifty-docs-action@v2.0.2
+        with:
+          transform-for-static-hosting: true
+          hosting-base-path: VDTransition
+          targets: VDTransition
+          output: doccs
       - name: Checkout
         uses: actions/checkout@v3
       - name: Setup Pages
@@ -35,7 +42,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v1
         with:
-          path: 'docs/'
+          path: 'doccs/'
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v1
