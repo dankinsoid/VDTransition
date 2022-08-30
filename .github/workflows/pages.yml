@@ -30,8 +30,7 @@ jobs:
     steps:
       - name: Swift Package Documentation Generator
         run: |
-          swift package --allow-writing-to-directory ./doccs \
-          generate-documentation --target VDTransition \
+          swift package generate-documentation --target VDTransition \
           --disable-indexing \
           --transform-for-static-hosting \
           --hosting-base-path VDTransition \
