@@ -34,11 +34,7 @@ jobs:
         uses: actions/configure-pages@v2
       - name: Swift Package Documentation Generator
         run: |
-          swift package generate-documentation \
-          --disable-indexing \
-          --transform-for-static-hosting \
-          --hosting-base-path VDTransition \
-          --output-path ./doccs
+          swift package generate-documentation
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v1
         with:
