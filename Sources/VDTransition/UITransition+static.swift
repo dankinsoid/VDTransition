@@ -85,14 +85,18 @@ extension UITransition where Base: Transformable {
     }
 
     public static func scale(_ scale: CGPoint, anchor: UnitPoint) -> UITransition {
-        UITransition(\.affineTransform) { progress, view, transform in
+        UITransition(\.[\.affineTransform, \.anchorPoint]) { progress, view, transform in
             let anchor = view.isLtrDirection ? anchor : UnitPoint(x: 1 - anchor.x, y: anchor.y)
             let scaleX = scale.x != 0 ? scale.x : 0.0001
             let scaleY = scale.y != 0 ? scale.y : 0.0001
-            let xPadding = 1 / scaleX * (anchor.x - view.anchorPoint.x) * view.bounds.width
-            let yPadding = 1 / scaleY * (anchor.y - view.anchorPoint.y) * view.bounds.height
-
-            view.affineTransform = transform
+            let xPadding = 1 / scaleX * (anchor.x - transform.1.x) * view.bounds.width
+            let yPadding = 1 / scaleY * (anchor.y - transform.1.y) * view.bounds.height
+            
+            view.anchorPoint = CGPoint(
+                x: progress.value(identity: transform.1.x, transformed: anchor.x),
+                y: progress.value(identity: transform.1.y, transformed: anchor.y)
+            )
+            view.affineTransform = transform.0
                 .scaledBy(
                     x: progress.value(identity: 1, transformed: scaleX),
                     y: progress.value(identity: 1, transformed: scaleY)

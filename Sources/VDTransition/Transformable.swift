@@ -10,6 +10,19 @@ public protocol Transformable {
     func convert(_ frame: CGRect, to: Self?) -> CGRect
 }
 
+extension Transformable {
+    
+    subscript<A, B>(keyPath1: ReferenceWritableKeyPath<Self, A>, keyPath2: ReferenceWritableKeyPath<Self, B>) -> (A, B) {
+        get {
+            (self[keyPath: keyPath1], self[keyPath: keyPath2])
+        }
+        nonmutating set {
+            self[keyPath: keyPath1] = newValue.0
+            self[keyPath: keyPath2] = newValue.1
+        }
+    }
+}
+
 #if canImport(UIKit)
 extension UIView: Transformable {
     
