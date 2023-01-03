@@ -1,6 +1,6 @@
 import Foundation
 
-public enum Progress {
+public enum Progress: Hashable, Codable {
     
     case insertion(CGFloat), removal(CGFloat)
     
