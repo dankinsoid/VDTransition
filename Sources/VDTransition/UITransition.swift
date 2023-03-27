@@ -131,7 +131,46 @@ extension UITransition {
     public func combined(with transition: UITransition) -> UITransition {
         .combined(self, transition)
     }
-
+    
+    public static func sequential(_ transitions: [UITransition]) -> UITransition {
+        guard !transitions.isEmpty else { return .identity }
+        guard transitions.count > 1 else { return transitions[0] }
+        let progressStep = 1 / Double(transitions.count)
+        return UITransition(
+            SequentialModifier(modifiers: transitions.map(\.modifiers)),
+            initialState: transitions.map(\.initialStates)
+        ) { progress, base, value in
+            let i = Int(progress.progress / progressStep)
+            let stepProgress = progress.progress.truncatingRemainder(dividingBy: progressStep)
+            switch progress.direction {
+            case .insertion:
+                transitions.prefix(upTo: i).forEach {
+                    $0.update(progress: .insertion(1), view: base)
+                }
+                transitions[i].update(progress: .insertion(stepProgress), view: base)
+                if i < transitions.count - 1 {
+                    transitions.suffix(from: i + 1).forEach {
+                        $0.update(progress: .insertion(0), view: base)
+                    }
+                }
+            case .removal:
+                if i < transitions.count - 1 {
+                    transitions.suffix(from: i + 1).forEach {
+                        $0.update(progress: .removal(1), view: base)
+                    }
+                }
+                transitions[i].update(progress: .removal(1 - stepProgress), view: base)
+                transitions.prefix(upTo: i).forEach {
+                    $0.update(progress: .removal(0), view: base)
+                }
+            }
+        }
+    }
+    
+    public static func sequential(_ transitions: UITransition...) -> UITransition {
+        .sequential(transitions)
+    }
+    
     private var flat: [UITransition] {
         if initialStates.isEmpty {
             return zip(transitions, modifiers).map {
