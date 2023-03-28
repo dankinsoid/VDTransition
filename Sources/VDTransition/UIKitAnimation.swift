@@ -134,6 +134,7 @@ extension UIView {
         _ animations: @escaping () -> Void,
         completion: ((Bool) -> Void)? = nil
     ) {
+        UIView.animateKeyframes(withDuration: <#T##TimeInterval#>, delay: <#T##TimeInterval#>, animations: <#T##() -> Void#>)
         if let spring = animation.spring {
             animate(
                 withDuration: animation.duration,

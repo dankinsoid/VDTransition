@@ -128,6 +128,24 @@ extension UIView {
             completion?()
         }
     }
+
+    public func animate(
+        _ transition: UIViewTransition,
+        direction: TransitionDirection = .removal,
+        animation: UIKitAnimation,
+        completion: ((Bool) -> Void)? = nil
+    ) {
+        var transition = transition
+        UIView.performWithoutAnimation {
+            transition.beforeTransition(view: self)
+            transition.update(progress: direction.at(.start), view: self)
+        }
+        UIView.animate(with: animation) {
+            transition.update(progress: direction.at(.end), view: self)
+        } completion: {
+            completion?($0)
+        }
+    }
 }
 
 extension UIWindow {

@@ -93,7 +93,14 @@ extension UITransition {
     
     struct Transition {
         
+        let keyFrame: KeyFrame
         var block: (_ progress: Progress, _ view: Base, _ initialValue: Any?) -> Void
+    }
+    
+    struct KeyFrame {
+        
+        let delay: Double
+        let diration: Double
     }
 }
 
@@ -130,6 +137,45 @@ extension UITransition {
     /// Combines this transition with another, returning a new transition that is the result of both transitions being applied.
     public func combined(with transition: UITransition) -> UITransition {
         .combined(self, transition)
+    }
+    
+    public static func keyFrames(_ transitions: [UITransition]) -> UITransition {
+        guard !transitions.isEmpty else { return .identity }
+        guard transitions.count > 1 else { return transitions[0] }
+        let progressStep = 1 / Double(transitions.count)
+        return UITransition(
+            SequentialModifier(modifiers: transitions.map(\.modifiers)),
+            initialState: transitions.map(\.initialStates)
+        ) { progress, base, value in
+            let i = Int(progress.progress / progressStep)
+            let stepProgress = progress.progress.truncatingRemainder(dividingBy: progressStep)
+            switch progress.direction {
+            case .insertion:
+                transitions.prefix(upTo: i).forEach {
+                    $0.update(progress: .insertion(1), view: base)
+                }
+                transitions[i].update(progress: .insertion(stepProgress), view: base)
+                if i < transitions.count - 1 {
+                    transitions.suffix(from: i + 1).forEach {
+                        $0.update(progress: .insertion(0), view: base)
+                    }
+                }
+            case .removal:
+                if i < transitions.count - 1 {
+                    transitions.suffix(from: i + 1).forEach {
+                        $0.update(progress: .removal(1), view: base)
+                    }
+                }
+                transitions[i].update(progress: .removal(1 - stepProgress), view: base)
+                transitions.prefix(upTo: i).forEach {
+                    $0.update(progress: .removal(0), view: base)
+                }
+            }
+        }
+    }
+    
+    public static func keyFrames(_ transitions: UITransition...) -> UITransition {
+        .keyFrames(transitions)
     }
     
     private var flat: [UITransition] {
