@@ -2,7 +2,7 @@
 import UIKit
 
 /// UIKit animation parameters
-public struct UIKitAnimation: ExpressibleByArrayLiteral {
+public struct UIKitAnimation: ExpressibleByArrayLiteral, Equatable {
     
     public typealias Options = UIView.AnimationOptions
 
@@ -90,7 +90,7 @@ public struct UIKitAnimation: ExpressibleByArrayLiteral {
     }
 
     ///Spring animation parameters
-    public struct Spring {
+    public struct Spring: Hashable {
 
         /// The damping ratio for the spring animation as it approaches its quiescent state.
         /// To smoothly decelerate the animation without oscillation, use a value of 1.
