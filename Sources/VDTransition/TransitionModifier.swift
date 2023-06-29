@@ -8,6 +8,7 @@ public protocol TransitionModifier {
     func matches(other: Self) -> Bool
     func set(value: Value, to root: Root)
     func value(for root: Root) -> Value
+    var any: AnyTransitionModifier<Root> { get }
 }
 
 public struct KeyPathModifier<Root, Value>: TransitionModifier {
@@ -43,10 +44,12 @@ public struct AnyTransitionModifier<Root>: TransitionModifier {
     private let isMatch: (AnyTransitionModifier) -> Bool
     private let setter: (Any, Root) -> Void
     private let getter: (Root) -> Any
+    private let base: Any
     
     public init<T: TransitionModifier>(_ modifier: T) where T.Root == Root {
+        base = modifier
         isMatch = {
-            ($0 as? T).map { modifier.matches(other: $0) } ?? false
+            ($0.base as? T).map(modifier.matches) ?? false
         }
         setter = {
             guard let value = $0 as? T.Value else { return }
@@ -56,6 +59,8 @@ public struct AnyTransitionModifier<Root>: TransitionModifier {
             modifier.value(for: $0)
         }
     }
+    
+    public var any: AnyTransitionModifier<Root> { self }
     
     public func matches(other: AnyTransitionModifier) -> Bool {
         isMatch(other)
