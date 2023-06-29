@@ -59,17 +59,17 @@ public struct UITransition<Base>: ExpressibleByArrayLiteral {
         self = .combined(elements)
     }
 
-    public mutating func beforeTransition(view: Base, current: UITransition? = nil) {
-        if let current, matches(current), !current.initialStates.isEmpty {
-            initialStates = current.initialStates
-        } else {
-            initialStates = modifiers.map { $0.value(for: view) }
-        }
+    public mutating func beforeTransition(view: Base) {
+        initialStates = modifiers.map { $0.value(for: view) }
     }
 
     public mutating func beforeTransitionIfNeeded(view: Base, current: UITransition? = nil) {
         guard initialStates.isEmpty else { return }
-        beforeTransition(view: view, current: current)
+        if let current, matches(current), !current.initialStates.isEmpty {
+            initialStates = current.initialStates
+        } else {
+            beforeTransition(view: view)
+        }
     }
     
     public func matches(_ other: UITransition) -> Bool {
