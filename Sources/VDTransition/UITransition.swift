@@ -59,13 +59,24 @@ public struct UITransition<Base>: ExpressibleByArrayLiteral {
         self = .combined(elements)
     }
 
-    public mutating func beforeTransition(view: Base) {
-        initialStates = modifiers.map { $0.value(for: view) }
+    public mutating func beforeTransition(view: Base, current: UITransition? = nil) {
+        if let current, matches(current), !current.initialStates.isEmpty {
+            initialStates = current.initialStates
+        } else {
+            initialStates = modifiers.map { $0.value(for: view) }
+        }
     }
 
-    public mutating func beforeTransitionIfNeeded(view: Base) {
+    public mutating func beforeTransitionIfNeeded(view: Base, current: UITransition? = nil) {
         guard initialStates.isEmpty else { return }
-        beforeTransition(view: view)
+        beforeTransition(view: view, current: current)
+    }
+    
+    public func matches(_ other: UITransition) -> Bool {
+        other.modifiers.count == modifiers.count &&
+        !zip(other.modifiers, modifiers).contains {
+            !$0.0.matches(other: $0.1)
+        }
     }
 
     public mutating func reset() {
@@ -86,6 +97,10 @@ public struct UITransition<Base>: ExpressibleByArrayLiteral {
         zip(transitions, initialStates).forEach {
             $0.0.block(progress, view, $0.1)
         }
+    }
+    
+    public static func ~=(_ lhs: UITransition, _ rhs: UITransition) -> Bool {
+        lhs.matches(rhs)
     }
 }
 
