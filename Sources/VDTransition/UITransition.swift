@@ -147,6 +147,30 @@ extension UITransition {
         .combined(self, transition)
     }
     
+    public static func conditional(
+        _ condition: @escaping (Progress) -> Bool,
+        true trueTransition: UITransition,
+        false falseTransition: UITransition
+    ) -> UITransition {
+        UITransition(
+            transitions: trueTransition.transitions.map { transition in
+                Transition {
+                    if condition($0) {
+                        transition.block($0, $1, $2)
+                    }
+                }
+            } + falseTransition.transitions.map { transition in
+                Transition {
+                    if !condition($0) {
+                        transition.block($0, $1, $2)
+                    }
+                }
+            },
+            modifiers: trueTransition.modifiers + falseTransition.modifiers,
+            initialStates: []
+        )
+    }
+    
     private var flat: [UITransition] {
         if initialStates.isEmpty {
             return zip(transitions, modifiers).map {
