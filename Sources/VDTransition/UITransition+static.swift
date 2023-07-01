@@ -63,8 +63,8 @@ extension UITransition where Base == UIView {
         .value(\.layer.cornerRadius, radius)
     }
 
-    public static func backgroundColor(_ color: UIColor) -> UITransition {
-        .value(\.backgroundColor, color)
+    public static func backgroundColor(_ color: UIColor, default initial: UIColor? = nil) -> UITransition {
+        .value(\.backgroundColor, color, default: initial)
     }
 }
 #endif
@@ -80,6 +80,14 @@ extension UITransition where Base: Transformable {
         }
     }
 
+    public static func rotate(_ angle: CGFloat) -> UITransition {
+        UITransition(\.affineTransform) { progress, view, transform in
+            view.affineTransform = transform.rotated(
+                by: progress.value(identity: 0, transformed: angle)
+            )
+        }
+    }
+    
     public static func scale(_ scale: CGFloat) -> UITransition {
         .scale(CGPoint(x: scale, y: scale))
     }
