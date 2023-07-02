@@ -38,7 +38,7 @@ import PackageDescription
 let package = Package(
   name: "SomeProject",
   dependencies: [
-    .package(url: "https://github.com/dankinsoid/VDTransition.git", from: "1.21.0")
+    .package(url: "https://github.com/dankinsoid/VDTransition.git", from: "1.22.0")
   ],
   targets: [
     .target(name: "SomeProject", dependencies: ["VDTransition"])

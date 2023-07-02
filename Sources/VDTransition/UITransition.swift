@@ -220,6 +220,40 @@ extension UITransition {
         )
     }
     
+    public var insertion: UITransition {
+        UITransition(
+            transitions: transitions.map { transition in
+                Transition {
+                    switch $0 {
+                    case .insertion:
+                        transition.block($0, $1, $2)
+                    case let .removal(progress):
+                        transition.block(.insertion(1 - progress), $1, $2)
+                    }
+                }
+            },
+            modifiers: modifiers,
+            initialStates: initialStates
+        )
+    }
+    
+    public var removal: UITransition {
+        UITransition(
+            transitions: transitions.map { transition in
+                Transition {
+                    switch $0 {
+                    case let .insertion(progress):
+                        transition.block(.removal(1 - progress), $1, $2)
+                    case .removal:
+                        transition.block($0, $1, $2)
+                    }
+                }
+            },
+            modifiers: modifiers,
+            initialStates: initialStates
+        )
+    }
+    
     public func map<T>(_ transform: @escaping (T) -> Base) -> UITransition<T> {
         UITransition<T>(
             transitions: transitions.map { transition in
