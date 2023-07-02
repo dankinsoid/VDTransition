@@ -254,6 +254,19 @@ extension UITransition {
         )
     }
     
+    
+    public func constant(at progress: Progress) -> UITransition {
+        UITransition(
+            transitions: transitions.map { transition in
+                Transition { _, a, b in
+                    transition.block(progress, a, b)
+                }
+            },
+            modifiers: modifiers,
+            initialStates: initialStates
+        )
+    }
+    
     public func map<T>(_ transform: @escaping (T) -> Base) -> UITransition<T> {
         UITransition<T>(
             transitions: transitions.map { transition in
