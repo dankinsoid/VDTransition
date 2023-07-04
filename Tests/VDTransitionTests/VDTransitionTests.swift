@@ -1,3 +1,5 @@
+#if canImport(UIKit)
+import UIKit
 import XCTest
 @testable import VDTransition
 
@@ -14,3 +16,4 @@ final class VDTests: XCTestCase {
         XCTAssertFalse(transition2.matches(transition3))
     }
 }
+#endif

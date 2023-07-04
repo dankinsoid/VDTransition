@@ -19,7 +19,7 @@ public struct UITransition<Base>: ExpressibleByArrayLiteral {
         transitions = [
             Transition { progress, view, value in
                 let value = initialState ?? (value as? T.Value) ?? modifier.value(for: view)
-                transition(progress, view, value)
+                return transition(progress, view, value)
             }
         ]
         modifiers = [
@@ -36,7 +36,7 @@ public struct UITransition<Base>: ExpressibleByArrayLiteral {
         transitions = [
             Transition { progress, view, value in
                 let value = initialState ?? (value as? T) ?? view[keyPath: keyPath]
-                transition(progress, view, value)
+                return transition(progress, view, value)
             }
         ]
         modifiers = [
@@ -95,7 +95,7 @@ public struct UITransition<Base>: ExpressibleByArrayLiteral {
             initialStates = modifiers.map { $0.value(for: view) }
         }
         zip(transitions, initialStates).forEach {
-            $0.0.block(progress, view, $0.1)
+            _ = $0.0.block(progress, view, $0.1)
         }
     }
     
@@ -108,7 +108,7 @@ extension UITransition {
     
     struct Transition {
         
-        var block: (_ progress: Progress, _ view: Base, _ initialValue: Any?) -> Void
+        var block: (_ progress: Progress, _ view: Base, _ initialValue: Any?) -> Any?
     }
 }
 
@@ -127,8 +127,8 @@ extension UITransition {
             if let i = result.modifiers.firstIndex(where: { transition.modifiers[0].matches(other: $0) }) {
                 let current = result.transitions[i]
                 result.transitions[i] = Transition {
-                    current.block($0, $1, $2)
-                    transition.transitions[0].block($0, $1, $2)
+                    let next = current.block($0, $1, $2)
+                    return transition.transitions[0].block($0, $1, next)
                 }
             } else {
                 result.transitions += transition.transitions
@@ -156,13 +156,17 @@ extension UITransition {
             transitions: trueTransition.transitions.map { transition in
                 Transition {
                     if condition($0) {
-                        transition.block($0, $1, $2)
+                        return transition.block($0, $1, $2)
+                    } else {
+                        return $2
                     }
                 }
             } + falseTransition.transitions.map { transition in
                 Transition {
                     if !condition($0) {
-                        transition.block($0, $1, $2)
+                        return transition.block($0, $1, $2)
+                    } else {
+                        return $2
                     }
                 }
             },
@@ -187,8 +191,8 @@ extension UITransition {
         UITransition(
             transitions: transitions.map { transition in
                 Transition {
-                    guard type($0) else { return }
-                    transition.block($0, $1, $2)
+                    guard type($0) else { return $2 }
+                    return transition.block($0, $1, $2)
                 }
             },
             modifiers: modifiers,
@@ -226,9 +230,9 @@ extension UITransition {
                 Transition {
                     switch $0 {
                     case .insertion:
-                        transition.block($0, $1, $2)
+                        return transition.block($0, $1, $2)
                     case let .removal(progress):
-                        transition.block(.insertion(1 - progress), $1, $2)
+                        return transition.block(.insertion(1 - progress), $1, $2)
                     }
                 }
             },
@@ -243,9 +247,9 @@ extension UITransition {
                 Transition {
                     switch $0 {
                     case let .insertion(progress):
-                        transition.block(.removal(1 - progress), $1, $2)
+                        return transition.block(.removal(1 - progress), $1, $2)
                     case .removal:
-                        transition.block($0, $1, $2)
+                        return transition.block($0, $1, $2)
                     }
                 }
             },
