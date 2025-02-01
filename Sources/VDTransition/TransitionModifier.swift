@@ -47,16 +47,20 @@ public struct AnyTransitionModifier<Root>: TransitionModifier {
     private let base: Any
     
     public init<T: TransitionModifier>(_ modifier: T) where T.Root == Root {
-        base = modifier
-        isMatch = {
-            ($0.base as? T).map(modifier.matches) ?? false
-        }
-        setter = {
-            guard let value = $0 as? T.Value else { return }
-            modifier.set(value: value, to: $1)
-        }
-        getter = {
-            modifier.value(for: $0)
+        if let any = modifier as? AnyTransitionModifier<Root> {
+            self = any
+        } else {
+            base = modifier
+            isMatch = {
+                ($0.base as? T).map(modifier.matches) ?? false
+            }
+            setter = {
+                guard let value = $0 as? T.Value else { return }
+                modifier.set(value: value, to: $1)
+            }
+            getter = {
+                modifier.value(for: $0)
+            }
         }
     }
     
