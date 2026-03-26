@@ -1,9 +1,23 @@
 import Foundation
 
+/// Animation progress, distinguishing between insertion and removal directions.
+///
+/// Progress values range from 0 (start of the transition) to 1 (end of the transition).
+/// - `.insertion(0)` = fully transformed (e.g. invisible), `.insertion(1)` = identity (e.g. fully visible).
+/// - `.removal(0)` = identity, `.removal(1)` = fully transformed.
+///
+/// ```swift
+/// // Interpolate between identity and transformed:
+/// let alpha = progress.value(identity: 1.0, transformed: 0.0)
+/// ```
 public enum Progress: Hashable, Codable {
+
+    /// Insertion in progress. Value goes from 0 (fully transformed) to 1 (identity).
+    case insertion(CGFloat)
+    /// Removal in progress. Value goes from 0 (identity) to 1 (fully transformed).
+    case removal(CGFloat)
     
-    case insertion(CGFloat), removal(CGFloat)
-    
+    /// The raw progress value (0…1), regardless of direction.
     public var value: CGFloat {
         get {
             switch self {
@@ -19,6 +33,9 @@ public enum Progress: Hashable, Codable {
         }
     }
     
+    /// Normalized progress: 0 = identity, 1 = fully transformed, for both directions.
+    ///
+    /// For insertion this equals `value`; for removal it equals `1 - value`.
     public var progress: CGFloat {
         get {
             switch self {
@@ -34,6 +51,7 @@ public enum Progress: Hashable, Codable {
         }
     }
     
+    /// Swaps direction and flips value: `insertion(v)` → `removal(1-v)` and vice versa.
     public var inverted: Progress {
         switch self {
         case .insertion(let float): return .removal(1 - float)
@@ -41,6 +59,7 @@ public enum Progress: Hashable, Codable {
         }
     }
     
+    /// Flips value within the same direction: `insertion(v)` → `insertion(1-v)`.
     public var reversed: Progress {
         switch self {
         case .insertion(let float): return .insertion(1 - float)
@@ -98,6 +117,14 @@ import SwiftUI
 
 extension Progress {
     
+    /// Interpolates between `identity` and `transformed` based on normalized progress.
+    ///
+    /// At progress 0 (identity state) returns `identity`; at progress 1 (fully transformed) returns `transformed`.
+    ///
+    /// - Parameters:
+    ///   - identity: The value at rest (not transformed).
+    ///   - transformed: The fully transformed value.
+    /// - Returns: The interpolated value.
     public func value<T: VectorArithmetic>(identity: T, transformed: T) -> T {
         var result = (identity - transformed)
         result.scale(by: progress)

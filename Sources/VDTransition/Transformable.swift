@@ -1,5 +1,16 @@
 import SwiftUI
 
+/// A view that exposes transform-related properties for animation.
+///
+/// `Transformable` provides a unified interface for `UIView` and `NSView` properties
+/// used by the library's transform transitions (`.scale()`, `.rotate()`, `.offset()`, `.anchor()`).
+///
+/// **KeyPath identity caveat:** The properties declared here (`affineTransform`, `anchorPoint`)
+/// are computed wrappers over the platform's native storage (e.g. `UIView.transform`,
+/// `CALayer.anchorPoint`). Their `PartialKeyPath` values are **distinct** from the native
+/// keyPaths. The library's factory methods consistently use `Transformable` keyPaths,
+/// so conflict detection works correctly as long as you use those methods rather than
+/// accessing `\.transform` or `\.layer.anchorPoint` directly.
 public protocol Transformable {
     
     var frame: CGRect { get nonmutating set }

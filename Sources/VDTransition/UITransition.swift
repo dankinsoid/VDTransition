@@ -1,7 +1,32 @@
 import Foundation
 
-/// @ai-generated(guided)
-/// UIKit transition
+/// A composable, keyPath-driven view transition.
+///
+/// `UITransition` animates one or more properties of a view (`Base`) between an identity state
+/// and a transformed state. Transitions are pure functions: they receive the current progress,
+/// the view, and captured initial values, and return the new property values.
+///
+/// **KeyPath matching and conflict detection.**
+/// Transitions that share a keyPath are detected as conflicting and composed sequentially
+/// via ``combined(_:)-1tcyc``. Matching relies on `PartialKeyPath` identity, which means:
+/// - Computed properties and protocol-defined aliases (e.g. `Transformable.affineTransform`
+///   vs `UIView.transform`) produce **different** keyPaths even if they access the same storage.
+/// - For `Transformable` properties (`affineTransform`, `anchorPoint`), prefer the library-provided
+///   factory methods (`.scale()`, `.rotate()`, `.offset()`, `.anchor()`) which use consistent keyPaths.
+///   Passing `\.transform` directly via the generic init will **not** match `.scale()` for conflict detection.
+///
+/// ```swift
+/// // Single property:
+/// let fade = UITransition<UIView>(\.alpha) { progress, view, alpha in
+///     progress.value(identity: alpha, transformed: 0)
+/// }
+///
+/// // Combine non-conflicting:
+/// let combined: UIViewTransition = [.opacity, .scale(0.5)]
+///
+/// // Apply:
+/// view.set(hidden: true, transition: .opacity, animation: .spring())
+/// ```
 public struct UITransition<Base>: ExpressibleByArrayLiteral {
 
     private var transitions: [SingleTransition]
@@ -13,12 +38,25 @@ public struct UITransition<Base>: ExpressibleByArrayLiteral {
         var initialState: [PartialKeyPath<Base>: Any]?
     }
 
+    /// Whether the transition has no effect (contains no property animations).
     public var isIdentity: Bool {
         transitions.isEmpty
     }
 
     // MARK: - Single keyPath init
 
+    /// Creates a transition that animates a single property.
+    ///
+    /// - Parameters:
+    ///   - keyPath: Stored property to animate. Avoid computed or aliased keyPaths — use
+    ///     library factory methods for `Transformable` properties instead.
+    ///   - initialState: Optional fixed identity value. When `nil`, the value is captured
+    ///     from the view at ``beforeTransition(view:)`` time.
+    ///   - transition: Pure function returning the new property value for the given progress.
+    ///     - `progress`: Current animation progress (insertion or removal, 0…1).
+    ///     - `Base`: The view being animated (read-only context, do not mutate directly).
+    ///     - `T`: The captured initial value of the property.
+    ///     - Returns: The new value to write to the property.
     public init<T>(
         _ keyPath: ReferenceWritableKeyPath<Base, T>,
         initialState: T? = nil,
@@ -39,6 +77,19 @@ public struct UITransition<Base>: ExpressibleByArrayLiteral {
 
     // MARK: - Two keyPath init
 
+    /// Creates a transition that animates two properties atomically.
+    ///
+    /// All multi-keyPath inits (2–12) work the same way: properties are captured together,
+    /// passed as a tuple to the transition closure, and the returned tuple is applied back
+    /// in declaration order. The order matters for properties with dependencies
+    /// (e.g. `anchorPoint` before `affineTransform`).
+    ///
+    /// - Parameters:
+    ///   - kp1: First property keyPath.
+    ///   - kp2: Second property keyPath.
+    ///   - initialState: Optional fixed identity values as a tuple. When `nil`, values are
+    ///     captured from the view.
+    ///   - transition: Pure function `(Progress, Base, (T1, T2)) -> (T1, T2)`.
     public init<T1, T2>(
         _ kp1: ReferenceWritableKeyPath<Base, T1>,
         _ kp2: ReferenceWritableKeyPath<Base, T2>,
@@ -479,6 +530,16 @@ public struct UITransition<Base>: ExpressibleByArrayLiteral {
 
     // MARK: - TransitionModifier init (backward compat)
 
+    /// Creates a transition from a ``TransitionModifier`` (legacy side-effecting API).
+    ///
+    /// Unlike keyPath-based inits, the transition closure here is side-effecting (`-> Void`)
+    /// and writes to the view directly. This init exists for backward compatibility with
+    /// `TransitionModifier`-based transitions like `transform(to:)`.
+    ///
+    /// - Parameters:
+    ///   - modifier: The transition modifier providing get/set for the animated value.
+    ///   - initialState: Optional fixed identity value.
+    ///   - transition: Side-effecting closure that mutates the view.
     public init<T: TransitionModifier>(
         _ modifier: T,
         initialState: T.Value? = nil,
@@ -510,12 +571,27 @@ public struct UITransition<Base>: ExpressibleByArrayLiteral {
 
     // MARK: - State management
 
+    /// Captures the current property values from the view as the identity (initial) state.
+    ///
+    /// Call this once before the animation begins. Subsequent calls to ``update(progress:view:)``
+    /// will interpolate between this captured state and the transformed state.
+    ///
+    /// - Parameter view: The view whose property values will be captured.
     public mutating func beforeTransition(view: Base) {
         for i in transitions.indices {
             transitions[i].initialState = transitions[i].captureState(from: view)
         }
     }
 
+    /// Captures initial state only if not already captured, optionally reusing state from a matching transition.
+    ///
+    /// When replacing one transition with another mid-animation, pass the old transition as `current`
+    /// to preserve its captured state (avoiding a visual jump). If `current` doesn't match or has
+    /// no captured state, falls back to capturing fresh values from the view.
+    ///
+    /// - Parameters:
+    ///   - view: The view to capture from if needed.
+    ///   - current: An existing transition whose captured state should be reused if it matches.
     public mutating func beforeTransitionIfNeeded(view: Base, current: UITransition? = nil) {
         guard transitions.contains(where: { $0.initialState == nil }) else { return }
         if let current, matches(current), current.transitions.contains(where: { $0.initialState != nil }) {
@@ -527,6 +603,14 @@ public struct UITransition<Base>: ExpressibleByArrayLiteral {
         }
     }
 
+    /// Returns `true` if both transitions animate the same set of properties (by keyPath identity).
+    ///
+    /// Used to determine whether one transition can replace another without visual discontinuity.
+    /// Note: matching relies on `PartialKeyPath` identity — see the type-level doc comment
+    /// for caveats about computed/aliased keyPaths.
+    ///
+    /// - Parameter other: The transition to compare against.
+    /// - Returns: `true` if both transitions have the same accessor keys in the same order.
     public func matches(_ other: UITransition) -> Bool {
         other.transitions.count == transitions.count &&
         zip(other.transitions, transitions).allSatisfy { a, b in
@@ -534,12 +618,18 @@ public struct UITransition<Base>: ExpressibleByArrayLiteral {
         }
     }
 
+    /// Clears captured initial state, forcing a fresh capture on the next ``beforeTransition(view:)``.
     public mutating func reset() {
         for i in transitions.indices {
             transitions[i].initialState = nil
         }
     }
 
+    /// Restores the view's properties to the captured initial state.
+    ///
+    /// Typically called in the animation completion handler to clean up after the transition.
+    ///
+    /// - Parameter view: The view to restore.
     public func setInitialState(view: Base) {
         for t in transitions {
             if let state = t.initialState {
@@ -548,6 +638,11 @@ public struct UITransition<Base>: ExpressibleByArrayLiteral {
         }
     }
 
+    /// Applies the transition at the given progress, writing computed values to the view.
+    ///
+    /// - Parameters:
+    ///   - progress: The current animation progress (e.g. `.insertion(0.5)`).
+    ///   - view: The view to update.
     public func update(progress: Progress, view: Base) {
         for t in transitions {
             let state = t.initialState ?? t.captureState(from: view)
@@ -556,6 +651,7 @@ public struct UITransition<Base>: ExpressibleByArrayLiteral {
         }
     }
 
+    /// Pattern matching operator. Equivalent to ``matches(_:)``.
     public static func ~=(_ lhs: UITransition, _ rhs: UITransition) -> Bool {
         lhs.matches(rhs)
     }
@@ -633,6 +729,13 @@ extension UITransition {
         .combined(self, transition)
     }
 
+    /// Creates a transition that applies one of two branches depending on a condition evaluated at each progress update.
+    ///
+    /// - Parameters:
+    ///   - condition: Predicate evaluated on each progress value.
+    ///   - trueTransition: Applied when `condition` returns `true`.
+    ///   - falseTransition: Applied when `condition` returns `false`.
+    /// - Returns: A transition that delegates to the matching branch.
     public static func conditional(
         _ condition: @escaping (Progress) -> Bool,
         true trueTransition: UITransition,
@@ -673,6 +776,10 @@ extension UITransition {
         }
     }
 
+    /// Returns a transition that only applies when the predicate is `true`; otherwise preserves identity state.
+    ///
+    /// - Parameter type: Predicate on progress. When `false`, the transition is a no-op for that update.
+    /// - Returns: A filtered transition.
     public func filter(_ type: @escaping (Progress) -> Bool) -> UITransition {
         UITransition(
             transitions: transitions.map { single in
@@ -688,6 +795,9 @@ extension UITransition {
         )
     }
 
+    /// Returns a transition with insertion and removal swapped and progress flipped.
+    ///
+    /// `insertion(v)` becomes `removal(1-v)` and vice versa.
     public var inverted: UITransition {
         UITransition(
             transitions: transitions.map { single in
@@ -702,6 +812,9 @@ extension UITransition {
         )
     }
 
+    /// Returns a transition with progress reversed within the same direction.
+    ///
+    /// `insertion(v)` becomes `insertion(1-v)`, `removal(v)` becomes `removal(1-v)`.
     public var reversed: UITransition {
         UITransition(
             transitions: transitions.map { single in
@@ -716,6 +829,9 @@ extension UITransition {
         )
     }
 
+    /// Returns a transition that treats both directions as insertion.
+    ///
+    /// Removal progress is converted to insertion: `removal(v)` becomes `insertion(1-v)`.
     public var insertion: UITransition {
         UITransition(
             transitions: transitions.map { single in
@@ -735,6 +851,9 @@ extension UITransition {
         )
     }
 
+    /// Returns a transition that treats both directions as removal.
+    ///
+    /// Insertion progress is converted to removal: `insertion(v)` becomes `removal(1-v)`.
     public var removal: UITransition {
         UITransition(
             transitions: transitions.map { single in
@@ -754,6 +873,10 @@ extension UITransition {
         )
     }
 
+    /// Returns a transition frozen at a specific progress value, ignoring the actual progress passed to `update`.
+    ///
+    /// - Parameter progress: The fixed progress value to use.
+    /// - Returns: A constant transition.
     public func constant(at progress: Progress) -> UITransition {
         UITransition(
             transitions: transitions.map { single in

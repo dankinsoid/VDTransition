@@ -16,6 +16,14 @@ extension UIColor {
 
 extension Progress {
     
+    /// Interpolates between two `UIColor` values based on normalized progress.
+    ///
+    /// Interpolation is performed component-wise in RGBA space.
+    ///
+    /// - Parameters:
+    ///   - identity: The color at rest.
+    ///   - transformed: The fully transformed color.
+    /// - Returns: The interpolated color.
     public func value(identity: UIColor, transformed: UIColor) -> UIColor {
         let iRGBA = identity.rgba
         let tRGBA = transformed.rgba
