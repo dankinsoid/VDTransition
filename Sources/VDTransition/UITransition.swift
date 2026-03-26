@@ -3,9 +3,14 @@ import Foundation
 /// UIKit transition
 public struct UITransition<Base>: ExpressibleByArrayLiteral {
 
-    private var transitions: [Transition]
-    private var modifiers: [AnyTransitionModifier<Base>]
-    private var initialStates: [Any]
+    private var transitions: [SingleTransition]
+
+    struct SingleTransition {
+
+        var transition: Transition
+        var modifier: AnyTransitionModifier<Base>
+        var initialState: Any?
+    }
 
     public var isIdentity: Bool {
         transitions.isEmpty
@@ -17,15 +22,16 @@ public struct UITransition<Base>: ExpressibleByArrayLiteral {
         transition: @escaping (Progress, Base, T.Value) -> Void
     ) where T.Root == Base {
         transitions = [
-            Transition { progress, view, value in
-                let value = initialState ?? (value as? T.Value) ?? modifier.value(for: view)
-                return transition(progress, view, value)
-            }
+            SingleTransition(
+                transition: Transition { progress, view, value in
+                    let value = initialState ?? (value as? T.Value) ?? modifier.value(for: view)
+                    return transition(progress, view, value)
+                },
+                modifier: AnyTransitionModifier(modifier),
+                
+                initialState: initialState
+            )
         ]
-        modifiers = [
-            AnyTransitionModifier(modifier)
-        ]
-        initialStates = initialState.map { [$0] } ?? []
     }
     
     public init<T>(
@@ -34,25 +40,21 @@ public struct UITransition<Base>: ExpressibleByArrayLiteral {
         transition: @escaping (Progress, Base, T) -> Void
     ) {
         transitions = [
-            Transition { progress, view, value in
-                let value = initialState ?? (value as? T) ?? view[keyPath: keyPath]
-                return transition(progress, view, value)
-            }
+            SingleTransition(
+                transition: Transition { progress, view, value in
+                    let value = initialState ?? (value as? T) ?? view[keyPath: keyPath]
+                    return transition(progress, view, value)
+                },
+                modifier: AnyTransitionModifier(KeyPathModifier(keyPath: keyPath)),
+                initialState: initialState
+            )
         ]
-        modifiers = [
-            AnyTransitionModifier(KeyPathModifier(keyPath: keyPath))
-        ]
-        initialStates = initialState.map { [$0] } ?? []
     }
 
     init(
-        transitions: [Transition],
-        modifiers: [AnyTransitionModifier<Base>],
-        initialStates: [Any]
+        transitions: [SingleTransition]
     ) {
         self.transitions = transitions
-        self.modifiers = modifiers
-        self.initialStates = initialStates
     }
 
     public init(arrayLiteral elements: UITransition...) {
@@ -60,42 +62,47 @@ public struct UITransition<Base>: ExpressibleByArrayLiteral {
     }
 
     public mutating func beforeTransition(view: Base) {
-        initialStates = modifiers.map { $0.value(for: view) }
+        for i in transitions.indices {
+            transitions[i].initialState = transitions[i].modifier.value(for: view)
+        }
     }
 
     public mutating func beforeTransitionIfNeeded(view: Base, current: UITransition? = nil) {
-        guard initialStates.isEmpty else { return }
-        if let current, matches(current), !current.initialStates.isEmpty {
-            initialStates = current.initialStates
+        guard transitions.contains(where: { $0.initialState == nil }) else { return }
+        if let current, matches(current), current.transitions.contains(where: { $0.initialState != nil }) {
+            for i in transitions.indices {
+                transitions[i].initialState = current.transitions[i].initialState
+            }
         } else {
             beforeTransition(view: view)
         }
     }
-    
+
     public func matches(_ other: UITransition) -> Bool {
-        other.modifiers.count == modifiers.count &&
-        !zip(other.modifiers, modifiers).contains {
-            !$0.0.matches(other: $0.1)
+        other.transitions.count == transitions.count &&
+        !zip(other.transitions, transitions).contains {
+            !$0.0.modifier.matches(other: $0.1.modifier)
         }
     }
 
     public mutating func reset() {
-        initialStates = []
+        for i in transitions.indices {
+            transitions[i].initialState = nil
+        }
     }
 
     public func setInitialState(view: Base) {
-        zip(initialStates, modifiers).forEach {
-            $0.1.set(value: $0.0, to: view)
+        for t in transitions {
+            if let state = t.initialState {
+                t.modifier.set(value: state, to: view)
+            }
         }
     }
 
     public func update(progress: Progress, view: Base) {
-        var initialStates = initialStates
-        if initialStates.isEmpty {
-            initialStates = modifiers.map { $0.value(for: view) }
-        }
-        zip(transitions, initialStates).forEach {
-            _ = $0.0.block(progress, view, $0.1)
+        for t in transitions {
+            let state = t.initialState ?? t.modifier.value(for: view)
+            _ = t.transition.block(progress, view, state)
         }
     }
     
@@ -123,21 +130,20 @@ extension UITransition {
 
         var result = UITransition.identity
 
-        for transition in transitions.flatMap({ $0.flat }) {
-            if let i = result.modifiers.firstIndex(where: { transition.modifiers[0].matches(other: $0) }) {
+        for single in transitions.flatMap({ $0.flat }) {
+            if let i = result.transitions.firstIndex(where: { single.transitions[0].modifier.matches(other: $0.modifier) }) {
                 let current = result.transitions[i]
-                result.transitions[i] = Transition {
-                    let next = current.block($0, $1, $2)
-                    return transition.transitions[0].block($0, $1, next)
-                }
+                result.transitions[i] = SingleTransition(
+                    transition: Transition { progress, view, initialValue in
+                        let next = current.transition.block(progress, view, initialValue)
+                        return single.transitions[0].transition.block(progress, view, next)
+                    },
+                    modifier: current.modifier,
+                    initialState: current.initialState
+                )
             } else {
-                result.transitions += transition.transitions
-                result.modifiers += transition.modifiers
-                result.initialStates += result.initialStates
+                result.transitions += single.transitions
             }
-        }
-        if result.initialStates.count != result.transitions.count {
-            result.initialStates = []
         }
         return result
     }
@@ -153,135 +159,147 @@ extension UITransition {
         false falseTransition: UITransition
     ) -> UITransition {
         UITransition(
-            transitions: trueTransition.transitions.map { transition in
-                Transition {
-                    if condition($0) {
-                        return transition.block($0, $1, $2)
-                    } else {
-                        return $2
-                    }
-                }
-            } + falseTransition.transitions.map { transition in
-                Transition {
-                    if !condition($0) {
-                        return transition.block($0, $1, $2)
-                    } else {
-                        return $2
-                    }
-                }
-            },
-            modifiers: trueTransition.modifiers + falseTransition.modifiers,
-            initialStates: []
+            transitions: trueTransition.transitions.map { single in
+                SingleTransition(
+                    transition: Transition { progress, view, initialValue in
+                        if condition(progress) {
+                            return single.transition.block(progress, view, initialValue)
+                        } else {
+                            return initialValue
+                        }
+                    },
+                    modifier: single.modifier,
+                    initialState: nil
+                )
+            } + falseTransition.transitions.map { single in
+                SingleTransition(
+                    transition: Transition { progress, view, initialValue in
+                        if !condition(progress) {
+                            return single.transition.block(progress, view, initialValue)
+                        } else {
+                            return initialValue
+                        }
+                    },
+                    modifier: single.modifier,
+                    initialState: nil
+                )
+            }
         )
     }
     
     private var flat: [UITransition] {
-        if initialStates.isEmpty {
-            return zip(transitions, modifiers).map {
-                UITransition(transitions: [$0.0], modifiers: [$0.1], initialStates: [])
-            }
-        } else {
-            return zip(zip(transitions, modifiers), initialStates).map {
-                UITransition(transitions: [$0.0.0], modifiers: [$0.0.1], initialStates: [$0.1])
-            }
+        transitions.map {
+            UITransition(transitions: [$0])
         }
     }
 
     public func filter(_ type: @escaping (Progress) -> Bool) -> UITransition {
         UITransition(
-            transitions: transitions.map { transition in
-                Transition {
-                    guard type($0) else { return $2 }
-                    return transition.block($0, $1, $2)
-                }
-            },
-            modifiers: modifiers,
-            initialStates: initialStates
+            transitions: transitions.map { single in
+                SingleTransition(
+                    transition: Transition { progress, view, initialValue in
+                        guard type(progress) else { return initialValue }
+                        return single.transition.block(progress, view, initialValue)
+                    },
+                    modifier: single.modifier,
+                    initialState: single.initialState
+                )
+            }
         )
     }
 
     public var inverted: UITransition {
         UITransition(
-            transitions: transitions.map { transition in
-                Transition {
-                    transition.block($0.inverted, $1, $2)
-                }
-            },
-            modifiers: modifiers,
-            initialStates: initialStates
+            transitions: transitions.map { single in
+                SingleTransition(
+                    transition: Transition { progress, view, initialValue in
+                        single.transition.block(progress.inverted, view, initialValue)
+                    },
+                    modifier: single.modifier,
+                    initialState: single.initialState
+                )
+            }
         )
     }
 
     public var reversed: UITransition {
         UITransition(
-            transitions: transitions.map { transition in
-                Transition {
-                    transition.block($0.reversed, $1, $2)
-                }
-            },
-            modifiers: modifiers,
-            initialStates: initialStates
+            transitions: transitions.map { single in
+                SingleTransition(
+                    transition: Transition { progress, view, initialValue in
+                        single.transition.block(progress.reversed, view, initialValue)
+                    },
+                    modifier: single.modifier,
+                    initialState: single.initialState
+                )
+            }
         )
     }
     
     public var insertion: UITransition {
         UITransition(
-            transitions: transitions.map { transition in
-                Transition {
-                    switch $0 {
-                    case .insertion:
-                        return transition.block($0, $1, $2)
-                    case let .removal(progress):
-                        return transition.block(.insertion(1 - progress), $1, $2)
-                    }
-                }
-            },
-            modifiers: modifiers,
-            initialStates: initialStates
+            transitions: transitions.map { single in
+                SingleTransition(
+                    transition: Transition { progress, view, initialValue in
+                        switch progress {
+                        case .insertion:
+                            return single.transition.block(progress, view, initialValue)
+                        case let .removal(value):
+                            return single.transition.block(.insertion(1 - value), view, initialValue)
+                        }
+                    },
+                    modifier: single.modifier,
+                    initialState: single.initialState
+                )
+            }
         )
     }
     
     public var removal: UITransition {
         UITransition(
-            transitions: transitions.map { transition in
-                Transition {
-                    switch $0 {
-                    case let .insertion(progress):
-                        return transition.block(.removal(1 - progress), $1, $2)
-                    case .removal:
-                        return transition.block($0, $1, $2)
-                    }
-                }
-            },
-            modifiers: modifiers,
-            initialStates: initialStates
+            transitions: transitions.map { single in
+                SingleTransition(
+                    transition: Transition { progress, view, initialValue in
+                        switch progress {
+                        case let .insertion(value):
+                            return single.transition.block(.removal(1 - value), view, initialValue)
+                        case .removal:
+                            return single.transition.block(progress, view, initialValue)
+                        }
+                    },
+                    modifier: single.modifier,
+                    initialState: single.initialState
+                )
+            }
         )
     }
     
     
     public func constant(at progress: Progress) -> UITransition {
         UITransition(
-            transitions: transitions.map { transition in
-                Transition { _, a, b in
-                    transition.block(progress, a, b)
-                }
-            },
-            modifiers: modifiers,
-            initialStates: initialStates
+            transitions: transitions.map { single in
+                SingleTransition(
+                    transition: Transition { _, view, initialValue in
+                        single.transition.block(progress, view, initialValue)
+                    },
+                    modifier: single.modifier,
+                    initialState: single.initialState
+                )
+            }
         )
     }
     
     public func map<T>(_ transform: @escaping (T) -> Base) -> UITransition<T> {
         UITransition<T>(
-            transitions: transitions.map { transition in
-                UITransition<T>.Transition {
-                    transition.block($0, transform($1), $2)
-                }
-            },
-            modifiers: modifiers.map {
-                $0.map(transform).any
-            },
-            initialStates: initialStates
+            transitions: transitions.map { single in
+                UITransition<T>.SingleTransition(
+                    transition: UITransition<T>.Transition { progress, view, initialValue in
+                        single.transition.block(progress, transform(view), initialValue)
+                    },
+                    modifier: single.modifier.map(transform).any,
+                    initialState: single.initialState
+                )
+            }
         )
     }
 }
