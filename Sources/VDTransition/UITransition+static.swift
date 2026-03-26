@@ -4,7 +4,7 @@ extension UITransition {
 
     /// A transition that don't modify the view.
     public static var identity: UITransition {
-        UITransition(transitions: [], modifiers: [], initialStates: [])
+        UITransition(transitions: [])
     }
 
     /// Combines all transition, returning a new transition that is the result of all transitions being applied.
