@@ -92,37 +92,37 @@ extension UITransition where Base: Transformable {
         .scale(CGPoint(x: scale, y: scale))
     }
 
-//    public static func scale(_ scale: CGPoint, anchor: UnitPoint) -> UITransition {
-//        UITransition(\.[\.anchorPoint, \.affineTransform]) { progress, view, transform -> (CGPoint, CGAffineTransform) in
-//            let anchor = view.isLtrDirection ? anchor : UnitPoint(x: 1 - anchor.x, y: anchor.y)
-//            let scaleX = scale.x != 0 ? scale.x : 0.0001
-//            let scaleY = scale.y != 0 ? scale.y : 0.0001
-//            let xPadding = 1 / scaleX * (anchor.x - transform.1.x) * view.bounds.width
-//            let yPadding = 1 / scaleY * (anchor.y - transform.1.y) * view.bounds.height
-//            
-//            return (
-//                CGPoint(
-//                    x: progress.value(identity: transform.1.x, transformed: anchor.x),
-//                    y: progress.value(identity: transform.1.y, transformed: anchor.y)
-//                ),
-//                transform.0
-//                    .scaledBy(
-//                        x: progress.value(identity: 1, transformed: scaleX),
-//                        y: progress.value(identity: 1, transformed: scaleY)
-//                    )
-//                    .translatedBy(
-//                        x: progress.value(identity: 0, transformed: xPadding),
-//                        y: progress.value(identity: 0, transformed: yPadding)
-//                    )
-//            )
-//        }
-//    }
-//
-//    public static func scale(_ scale: CGFloat = 0.0001, anchor: UnitPoint) -> UITransition {
-//        .scale(CGPoint(x: scale, y: scale), anchor: anchor)
-//    }
-//
-//    public static var scale: UITransition { .scale(0.0001) }
+    public static func scale(_ scale: CGPoint, anchor: UnitPoint) -> UITransition {
+        UITransition(\.anchorPoint, \.affineTransform) { progress, view, initial -> (CGPoint, CGAffineTransform) in
+            let anchor = view.isLtrDirection ? anchor : UnitPoint(x: 1 - anchor.x, y: anchor.y)
+            let scaleX = scale.x != 0 ? scale.x : 0.0001
+            let scaleY = scale.y != 0 ? scale.y : 0.0001
+            let xPadding = 1 / scaleX * (anchor.x - initial.0.x) * view.bounds.width
+            let yPadding = 1 / scaleY * (anchor.y - initial.0.y) * view.bounds.height
+            
+            return (
+                CGPoint(
+                    x: progress.value(identity: initial.0.x, transformed: anchor.x),
+                    y: progress.value(identity: initial.0.y, transformed: anchor.y)
+                ),
+                initial.1
+                    .scaledBy(
+                        x: progress.value(identity: 1, transformed: scaleX),
+                        y: progress.value(identity: 1, transformed: scaleY)
+                    )
+                    .translatedBy(
+                        x: progress.value(identity: 0, transformed: xPadding),
+                        y: progress.value(identity: 0, transformed: yPadding)
+                    )
+            )
+        }
+    }
+
+    public static func scale(_ scale: CGFloat = 0.0001, anchor: UnitPoint) -> UITransition {
+        .scale(CGPoint(x: scale, y: scale), anchor: anchor)
+    }
+
+    public static var scale: UITransition { .scale(0.0001) }
 
     public static func anchor(point: UnitPoint) -> UITransition {
         UITransition(\.anchorPoint) { progress, view, anchor in
