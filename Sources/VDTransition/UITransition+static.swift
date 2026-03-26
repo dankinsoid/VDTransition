@@ -23,13 +23,13 @@ extension UITransition {
     
     public static func value<T: VectorArithmetic>(_ keyPath: ReferenceWritableKeyPath<Base, T>, _ transformed: T, default defaultValue: T? = nil) -> UITransition {
         UITransition(keyPath) { progress, view, value in
-            view[keyPath: keyPath] = progress.value(identity: defaultValue ?? value, transformed: transformed)
+            progress.value(identity: defaultValue ?? value, transformed: transformed)
         }
     }
     
     public static func constant<T>(_ keyPath: ReferenceWritableKeyPath<Base, T>, _ value: T) -> UITransition {
         UITransition(keyPath) { _, view, _ in
-            view[keyPath: keyPath] = value
+            value
         }
     }
 }
@@ -39,7 +39,7 @@ extension UITransition {
     
     public static func value(_ keyPath: ReferenceWritableKeyPath<Base, UIColor?>, _ transformed: UIColor, default defaultValue: UIColor? = nil) -> UITransition {
         UITransition(keyPath) { progress, view, value in
-            view[keyPath: keyPath] = value.map {
+            value.map {
                 progress.value(identity: defaultValue ?? $0, transformed: transformed)
             }
         }
@@ -47,7 +47,7 @@ extension UITransition {
     
     public static func value(_ keyPath: ReferenceWritableKeyPath<Base, UIColor>, _ transformed: UIColor, default defaultValue: UIColor? = nil) -> UITransition {
         UITransition(keyPath) { progress, view, value in
-            view[keyPath: keyPath] = progress.value(identity: defaultValue ?? value, transformed: transformed)
+            progress.value(identity: defaultValue ?? value, transformed: transformed)
         }
     }
 }
@@ -73,7 +73,7 @@ extension UITransition where Base: Transformable {
 
     public static func scale(_ scale: CGPoint) -> UITransition {
         UITransition(\.affineTransform) { progress, view, transform in
-            view.affineTransform = transform.scaledBy(
+            transform.scaledBy(
                 x: progress.value(identity: 1, transformed: scale.x),
                 y: progress.value(identity: 1, transformed: scale.y)
             )
@@ -82,7 +82,7 @@ extension UITransition where Base: Transformable {
 
     public static func rotate(_ angle: CGFloat) -> UITransition {
         UITransition(\.affineTransform) { progress, view, transform in
-            view.affineTransform = transform.rotated(
+            transform.rotated(
                 by: progress.value(identity: 0, transformed: angle)
             )
         }
@@ -92,50 +92,51 @@ extension UITransition where Base: Transformable {
         .scale(CGPoint(x: scale, y: scale))
     }
 
-    public static func scale(_ scale: CGPoint, anchor: UnitPoint) -> UITransition {
-        UITransition(\.[\.affineTransform, \.anchorPoint]) { progress, view, transform in
-            let anchor = view.isLtrDirection ? anchor : UnitPoint(x: 1 - anchor.x, y: anchor.y)
-            let scaleX = scale.x != 0 ? scale.x : 0.0001
-            let scaleY = scale.y != 0 ? scale.y : 0.0001
-            let xPadding = 1 / scaleX * (anchor.x - transform.1.x) * view.bounds.width
-            let yPadding = 1 / scaleY * (anchor.y - transform.1.y) * view.bounds.height
-            
-            view.anchorPoint = CGPoint(
-                x: progress.value(identity: transform.1.x, transformed: anchor.x),
-                y: progress.value(identity: transform.1.y, transformed: anchor.y)
-            )
-            view.affineTransform = transform.0
-                .scaledBy(
-                    x: progress.value(identity: 1, transformed: scaleX),
-                    y: progress.value(identity: 1, transformed: scaleY)
-                )
-                .translatedBy(
-                    x: progress.value(identity: 0, transformed: xPadding),
-                    y: progress.value(identity: 0, transformed: yPadding)
-                )
-        }
-    }
-
-    public static func scale(_ scale: CGFloat = 0.0001, anchor: UnitPoint) -> UITransition {
-        .scale(CGPoint(x: scale, y: scale), anchor: anchor)
-    }
-
-    public static var scale: UITransition { .scale(0.0001) }
+//    public static func scale(_ scale: CGPoint, anchor: UnitPoint) -> UITransition {
+//        UITransition(\.[\.anchorPoint, \.affineTransform]) { progress, view, transform -> (CGPoint, CGAffineTransform) in
+//            let anchor = view.isLtrDirection ? anchor : UnitPoint(x: 1 - anchor.x, y: anchor.y)
+//            let scaleX = scale.x != 0 ? scale.x : 0.0001
+//            let scaleY = scale.y != 0 ? scale.y : 0.0001
+//            let xPadding = 1 / scaleX * (anchor.x - transform.1.x) * view.bounds.width
+//            let yPadding = 1 / scaleY * (anchor.y - transform.1.y) * view.bounds.height
+//            
+//            return (
+//                CGPoint(
+//                    x: progress.value(identity: transform.1.x, transformed: anchor.x),
+//                    y: progress.value(identity: transform.1.y, transformed: anchor.y)
+//                ),
+//                transform.0
+//                    .scaledBy(
+//                        x: progress.value(identity: 1, transformed: scaleX),
+//                        y: progress.value(identity: 1, transformed: scaleY)
+//                    )
+//                    .translatedBy(
+//                        x: progress.value(identity: 0, transformed: xPadding),
+//                        y: progress.value(identity: 0, transformed: yPadding)
+//                    )
+//            )
+//        }
+//    }
+//
+//    public static func scale(_ scale: CGFloat = 0.0001, anchor: UnitPoint) -> UITransition {
+//        .scale(CGPoint(x: scale, y: scale), anchor: anchor)
+//    }
+//
+//    public static var scale: UITransition { .scale(0.0001) }
 
     public static func anchor(point: UnitPoint) -> UITransition {
         UITransition(\.anchorPoint) { progress, view, anchor in
             let point = view.isLtrDirection ? point : UnitPoint(x: 1 - point.x, y: point.y)
-            let anchorPoint = CGPoint(
+            return CGPoint(
                 x: progress.value(identity: anchor.x, transformed: point.x),
                 y: progress.value(identity: anchor.y, transformed: point.y)
             )
-            view.anchorPoint = anchorPoint
         }
     }
 
     public static func offset(_ point: CGPoint) -> UITransition {
         UITransition(\.affineTransform) { progress, view, affineTransform in
-            view.affineTransform = affineTransform.translatedBy(
+            affineTransform.translatedBy(
                 x: progress.value(identity: 0, transformed: point.x),
                 y: progress.value(identity: 0, transformed: point.y)
             )
@@ -151,22 +152,22 @@ extension UITransition where Base: Transformable {
         UITransition(\.affineTransform) { progress, view, affineTransform in
             switch (edge, view.isLtrDirection) {
             case (.leading, true), (.trailing, false):
-                view.affineTransform = affineTransform.translatedBy(
+                return affineTransform.translatedBy(
                     x: progress.value(identity: 0, transformed: -offset.value(for: view.frame.width)),
                     y: 0
                 )
             case (.leading, false), (.trailing, true):
-                view.affineTransform = affineTransform.translatedBy(
+                return affineTransform.translatedBy(
                     x: progress.value(identity: 0, transformed: offset.value(for: view.frame.width)),
                     y: 0
                 )
             case (.top, _):
-                view.affineTransform = affineTransform.translatedBy(
+                return affineTransform.translatedBy(
                     x: 0,
                     y: progress.value(identity: 0, transformed: -offset.value(for: view.frame.height))
                 )
             case (.bottom, _):
-                view.affineTransform = affineTransform.translatedBy(
+                return affineTransform.translatedBy(
                     x: 0,
                     y: progress.value(identity: 0, transformed: offset.value(for: view.frame.height))
                 )

@@ -37,7 +37,7 @@ public struct UITransition<Base>: ExpressibleByArrayLiteral {
     public init<T>(
         _ keyPath: ReferenceWritableKeyPath<Base, T>,
         initialState: T? = nil,
-        transition: @escaping (Progress, Base, T) -> Void
+        transition: @escaping (Progress, Base, T) -> T
     ) {
         transitions = [
             SingleTransition(
@@ -102,20 +102,21 @@ public struct UITransition<Base>: ExpressibleByArrayLiteral {
     public func update(progress: Progress, view: Base) {
         for t in transitions {
             let state = t.initialState ?? t.modifier.value(for: view)
-            _ = t.transition.block(progress, view, state)
+            let value = t.transition.block(progress, view, state)
+            t.modifier.set(value: value, to: view)
         }
     }
-    
+
     public static func ~=(_ lhs: UITransition, _ rhs: UITransition) -> Bool {
         lhs.matches(rhs)
     }
 }
 
 extension UITransition {
-    
+
     struct Transition {
-        
-        var block: (_ progress: Progress, _ view: Base, _ initialValue: Any?) -> Any?
+
+        var block: (_ progress: Progress, _ view: Base, _ initialValue: Any) -> Any
     }
 }
 
