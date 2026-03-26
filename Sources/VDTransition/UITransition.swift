@@ -528,37 +528,6 @@ public struct UITransition<Base>: ExpressibleByArrayLiteral {
         ]
     }
 
-    // MARK: - TransitionModifier init (backward compat)
-
-    /// Creates a transition from a ``TransitionModifier`` (legacy side-effecting API).
-    ///
-    /// Unlike keyPath-based inits, the transition closure here is side-effecting (`-> Void`)
-    /// and writes to the view directly. This init exists for backward compatibility with
-    /// `TransitionModifier`-based transitions like `transform(to:)`.
-    ///
-    /// - Parameters:
-    ///   - modifier: The transition modifier providing get/set for the animated value.
-    ///   - initialState: Optional fixed identity value.
-    ///   - transition: Side-effecting closure that mutates the view.
-    public init<T: TransitionModifier>(
-        _ modifier: T,
-        initialState: T.Value? = nil,
-        transition: @escaping (Progress, Base, T.Value) -> Void
-    ) where T.Root == Base {
-        transitions = [
-            SingleTransition(
-                transition: Transition { progress, view, _ in
-                    let value = initialState ?? modifier.value(for: view)
-                    transition(progress, view, value)
-                    // Side-effecting: no state to return
-                    return [:]
-                },
-                accessors: [],
-                initialState: nil
-            )
-        ]
-    }
-
     init(
         transitions: [SingleTransition]
     ) {
