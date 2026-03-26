@@ -99,6 +99,384 @@ public struct UITransition<Base>: ExpressibleByArrayLiteral {
         ]
     }
 
+    // MARK: - Four keyPath init
+
+    public init<T1, T2, T3, T4>(
+        _ kp1: ReferenceWritableKeyPath<Base, T1>,
+        _ kp2: ReferenceWritableKeyPath<Base, T2>,
+        _ kp3: ReferenceWritableKeyPath<Base, T3>,
+        _ kp4: ReferenceWritableKeyPath<Base, T4>,
+        initialState: (T1, T2, T3, T4)? = nil,
+        transition: @escaping (Progress, Base, (T1, T2, T3, T4)) -> (T1, T2, T3, T4)
+    ) {
+        let a1 = PropertyAccessor(kp1)
+        let a2 = PropertyAccessor(kp2)
+        let a3 = PropertyAccessor(kp3)
+        let a4 = PropertyAccessor(kp4)
+        transitions = [
+            SingleTransition(
+                transition: Transition { progress, view, state in
+                    let v: (T1, T2, T3, T4)
+                    if let initial = initialState {
+                        v = initial
+                    } else if let v1 = state[kp1] as? T1, let v2 = state[kp2] as? T2, let v3 = state[kp3] as? T3, let v4 = state[kp4] as? T4 {
+                        v = (v1, v2, v3, v4)
+                    } else {
+                        v = (view[keyPath: kp1], view[keyPath: kp2], view[keyPath: kp3], view[keyPath: kp4])
+                    }
+                    let result = transition(progress, view, v)
+                    return [kp1: result.0 as Any, kp2: result.1 as Any, kp3: result.2 as Any, kp4: result.3 as Any]
+                },
+                accessors: [a1, a2, a3, a4],
+                initialState: initialState.map { [kp1: $0.0 as Any, kp2: $0.1 as Any, kp3: $0.2 as Any, kp4: $0.3 as Any] }
+            )
+        ]
+    }
+
+    // MARK: - Five keyPath init
+
+    public init<T1, T2, T3, T4, T5>(
+        _ kp1: ReferenceWritableKeyPath<Base, T1>,
+        _ kp2: ReferenceWritableKeyPath<Base, T2>,
+        _ kp3: ReferenceWritableKeyPath<Base, T3>,
+        _ kp4: ReferenceWritableKeyPath<Base, T4>,
+        _ kp5: ReferenceWritableKeyPath<Base, T5>,
+        initialState: (T1, T2, T3, T4, T5)? = nil,
+        transition: @escaping (Progress, Base, (T1, T2, T3, T4, T5)) -> (T1, T2, T3, T4, T5)
+    ) {
+        let a1 = PropertyAccessor(kp1)
+        let a2 = PropertyAccessor(kp2)
+        let a3 = PropertyAccessor(kp3)
+        let a4 = PropertyAccessor(kp4)
+        let a5 = PropertyAccessor(kp5)
+        transitions = [
+            SingleTransition(
+                transition: Transition { progress, view, state in
+                    let v: (T1, T2, T3, T4, T5)
+                    if let initial = initialState {
+                        v = initial
+                    } else if let v1 = state[kp1] as? T1, let v2 = state[kp2] as? T2, let v3 = state[kp3] as? T3, let v4 = state[kp4] as? T4, let v5 = state[kp5] as? T5 {
+                        v = (v1, v2, v3, v4, v5)
+                    } else {
+                        v = (view[keyPath: kp1], view[keyPath: kp2], view[keyPath: kp3], view[keyPath: kp4], view[keyPath: kp5])
+                    }
+                    let result = transition(progress, view, v)
+                    return [kp1: result.0 as Any, kp2: result.1 as Any, kp3: result.2 as Any, kp4: result.3 as Any, kp5: result.4 as Any]
+                },
+                accessors: [a1, a2, a3, a4, a5],
+                initialState: initialState.map { [kp1: $0.0 as Any, kp2: $0.1 as Any, kp3: $0.2 as Any, kp4: $0.3 as Any, kp5: $0.4 as Any] }
+            )
+        ]
+    }
+
+    // MARK: - Six keyPath init
+
+    public init<T1, T2, T3, T4, T5, T6>(
+        _ kp1: ReferenceWritableKeyPath<Base, T1>,
+        _ kp2: ReferenceWritableKeyPath<Base, T2>,
+        _ kp3: ReferenceWritableKeyPath<Base, T3>,
+        _ kp4: ReferenceWritableKeyPath<Base, T4>,
+        _ kp5: ReferenceWritableKeyPath<Base, T5>,
+        _ kp6: ReferenceWritableKeyPath<Base, T6>,
+        initialState: (T1, T2, T3, T4, T5, T6)? = nil,
+        transition: @escaping (Progress, Base, (T1, T2, T3, T4, T5, T6)) -> (T1, T2, T3, T4, T5, T6)
+    ) {
+        let a1 = PropertyAccessor(kp1)
+        let a2 = PropertyAccessor(kp2)
+        let a3 = PropertyAccessor(kp3)
+        let a4 = PropertyAccessor(kp4)
+        let a5 = PropertyAccessor(kp5)
+        let a6 = PropertyAccessor(kp6)
+        transitions = [
+            SingleTransition(
+                transition: Transition { progress, view, state in
+                    let v: (T1, T2, T3, T4, T5, T6)
+                    if let initial = initialState {
+                        v = initial
+                    } else if let v1 = state[kp1] as? T1, let v2 = state[kp2] as? T2, let v3 = state[kp3] as? T3, let v4 = state[kp4] as? T4, let v5 = state[kp5] as? T5, let v6 = state[kp6] as? T6 {
+                        v = (v1, v2, v3, v4, v5, v6)
+                    } else {
+                        v = (view[keyPath: kp1], view[keyPath: kp2], view[keyPath: kp3], view[keyPath: kp4], view[keyPath: kp5], view[keyPath: kp6])
+                    }
+                    let result = transition(progress, view, v)
+                    return [kp1: result.0 as Any, kp2: result.1 as Any, kp3: result.2 as Any, kp4: result.3 as Any, kp5: result.4 as Any, kp6: result.5 as Any]
+                },
+                accessors: [a1, a2, a3, a4, a5, a6],
+                initialState: initialState.map { [kp1: $0.0 as Any, kp2: $0.1 as Any, kp3: $0.2 as Any, kp4: $0.3 as Any, kp5: $0.4 as Any, kp6: $0.5 as Any] }
+            )
+        ]
+    }
+
+    // MARK: - Seven keyPath init
+
+    public init<T1, T2, T3, T4, T5, T6, T7>(
+        _ kp1: ReferenceWritableKeyPath<Base, T1>,
+        _ kp2: ReferenceWritableKeyPath<Base, T2>,
+        _ kp3: ReferenceWritableKeyPath<Base, T3>,
+        _ kp4: ReferenceWritableKeyPath<Base, T4>,
+        _ kp5: ReferenceWritableKeyPath<Base, T5>,
+        _ kp6: ReferenceWritableKeyPath<Base, T6>,
+        _ kp7: ReferenceWritableKeyPath<Base, T7>,
+        initialState: (T1, T2, T3, T4, T5, T6, T7)? = nil,
+        transition: @escaping (Progress, Base, (T1, T2, T3, T4, T5, T6, T7)) -> (T1, T2, T3, T4, T5, T6, T7)
+    ) {
+        let a1 = PropertyAccessor(kp1)
+        let a2 = PropertyAccessor(kp2)
+        let a3 = PropertyAccessor(kp3)
+        let a4 = PropertyAccessor(kp4)
+        let a5 = PropertyAccessor(kp5)
+        let a6 = PropertyAccessor(kp6)
+        let a7 = PropertyAccessor(kp7)
+        transitions = [
+            SingleTransition(
+                transition: Transition { progress, view, state in
+                    let v: (T1, T2, T3, T4, T5, T6, T7)
+                    if let initial = initialState {
+                        v = initial
+                    } else if let v1 = state[kp1] as? T1, let v2 = state[kp2] as? T2, let v3 = state[kp3] as? T3, let v4 = state[kp4] as? T4, let v5 = state[kp5] as? T5, let v6 = state[kp6] as? T6, let v7 = state[kp7] as? T7 {
+                        v = (v1, v2, v3, v4, v5, v6, v7)
+                    } else {
+                        v = (view[keyPath: kp1], view[keyPath: kp2], view[keyPath: kp3], view[keyPath: kp4], view[keyPath: kp5], view[keyPath: kp6], view[keyPath: kp7])
+                    }
+                    let result = transition(progress, view, v)
+                    return [kp1: result.0 as Any, kp2: result.1 as Any, kp3: result.2 as Any, kp4: result.3 as Any, kp5: result.4 as Any, kp6: result.5 as Any, kp7: result.6 as Any]
+                },
+                accessors: [a1, a2, a3, a4, a5, a6, a7],
+                initialState: initialState.map { [kp1: $0.0 as Any, kp2: $0.1 as Any, kp3: $0.2 as Any, kp4: $0.3 as Any, kp5: $0.4 as Any, kp6: $0.5 as Any, kp7: $0.6 as Any] }
+            )
+        ]
+    }
+
+    // MARK: - Eight keyPath init
+
+    public init<T1, T2, T3, T4, T5, T6, T7, T8>(
+        _ kp1: ReferenceWritableKeyPath<Base, T1>,
+        _ kp2: ReferenceWritableKeyPath<Base, T2>,
+        _ kp3: ReferenceWritableKeyPath<Base, T3>,
+        _ kp4: ReferenceWritableKeyPath<Base, T4>,
+        _ kp5: ReferenceWritableKeyPath<Base, T5>,
+        _ kp6: ReferenceWritableKeyPath<Base, T6>,
+        _ kp7: ReferenceWritableKeyPath<Base, T7>,
+        _ kp8: ReferenceWritableKeyPath<Base, T8>,
+        initialState: (T1, T2, T3, T4, T5, T6, T7, T8)? = nil,
+        transition: @escaping (Progress, Base, (T1, T2, T3, T4, T5, T6, T7, T8)) -> (T1, T2, T3, T4, T5, T6, T7, T8)
+    ) {
+        let a1 = PropertyAccessor(kp1)
+        let a2 = PropertyAccessor(kp2)
+        let a3 = PropertyAccessor(kp3)
+        let a4 = PropertyAccessor(kp4)
+        let a5 = PropertyAccessor(kp5)
+        let a6 = PropertyAccessor(kp6)
+        let a7 = PropertyAccessor(kp7)
+        let a8 = PropertyAccessor(kp8)
+        transitions = [
+            SingleTransition(
+                transition: Transition { progress, view, state in
+                    let v: (T1, T2, T3, T4, T5, T6, T7, T8)
+                    if let initial = initialState {
+                        v = initial
+                    } else if let v1 = state[kp1] as? T1, let v2 = state[kp2] as? T2, let v3 = state[kp3] as? T3, let v4 = state[kp4] as? T4, let v5 = state[kp5] as? T5, let v6 = state[kp6] as? T6, let v7 = state[kp7] as? T7, let v8 = state[kp8] as? T8 {
+                        v = (v1, v2, v3, v4, v5, v6, v7, v8)
+                    } else {
+                        v = (view[keyPath: kp1], view[keyPath: kp2], view[keyPath: kp3], view[keyPath: kp4], view[keyPath: kp5], view[keyPath: kp6], view[keyPath: kp7], view[keyPath: kp8])
+                    }
+                    let result = transition(progress, view, v)
+                    return [kp1: result.0 as Any, kp2: result.1 as Any, kp3: result.2 as Any, kp4: result.3 as Any, kp5: result.4 as Any, kp6: result.5 as Any, kp7: result.6 as Any, kp8: result.7 as Any]
+                },
+                accessors: [a1, a2, a3, a4, a5, a6, a7, a8],
+                initialState: initialState.map { [kp1: $0.0 as Any, kp2: $0.1 as Any, kp3: $0.2 as Any, kp4: $0.3 as Any, kp5: $0.4 as Any, kp6: $0.5 as Any, kp7: $0.6 as Any, kp8: $0.7 as Any] }
+            )
+        ]
+    }
+
+    // MARK: - Nine keyPath init
+
+    public init<T1, T2, T3, T4, T5, T6, T7, T8, T9>(
+        _ kp1: ReferenceWritableKeyPath<Base, T1>,
+        _ kp2: ReferenceWritableKeyPath<Base, T2>,
+        _ kp3: ReferenceWritableKeyPath<Base, T3>,
+        _ kp4: ReferenceWritableKeyPath<Base, T4>,
+        _ kp5: ReferenceWritableKeyPath<Base, T5>,
+        _ kp6: ReferenceWritableKeyPath<Base, T6>,
+        _ kp7: ReferenceWritableKeyPath<Base, T7>,
+        _ kp8: ReferenceWritableKeyPath<Base, T8>,
+        _ kp9: ReferenceWritableKeyPath<Base, T9>,
+        initialState: (T1, T2, T3, T4, T5, T6, T7, T8, T9)? = nil,
+        transition: @escaping (Progress, Base, (T1, T2, T3, T4, T5, T6, T7, T8, T9)) -> (T1, T2, T3, T4, T5, T6, T7, T8, T9)
+    ) {
+        let a1 = PropertyAccessor(kp1)
+        let a2 = PropertyAccessor(kp2)
+        let a3 = PropertyAccessor(kp3)
+        let a4 = PropertyAccessor(kp4)
+        let a5 = PropertyAccessor(kp5)
+        let a6 = PropertyAccessor(kp6)
+        let a7 = PropertyAccessor(kp7)
+        let a8 = PropertyAccessor(kp8)
+        let a9 = PropertyAccessor(kp9)
+        transitions = [
+            SingleTransition(
+                transition: Transition { progress, view, state in
+                    let v: (T1, T2, T3, T4, T5, T6, T7, T8, T9)
+                    if let initial = initialState {
+                        v = initial
+                    } else if let v1 = state[kp1] as? T1, let v2 = state[kp2] as? T2, let v3 = state[kp3] as? T3, let v4 = state[kp4] as? T4, let v5 = state[kp5] as? T5, let v6 = state[kp6] as? T6, let v7 = state[kp7] as? T7, let v8 = state[kp8] as? T8, let v9 = state[kp9] as? T9 {
+                        v = (v1, v2, v3, v4, v5, v6, v7, v8, v9)
+                    } else {
+                        v = (view[keyPath: kp1], view[keyPath: kp2], view[keyPath: kp3], view[keyPath: kp4], view[keyPath: kp5], view[keyPath: kp6], view[keyPath: kp7], view[keyPath: kp8], view[keyPath: kp9])
+                    }
+                    let result = transition(progress, view, v)
+                    return [kp1: result.0 as Any, kp2: result.1 as Any, kp3: result.2 as Any, kp4: result.3 as Any, kp5: result.4 as Any, kp6: result.5 as Any, kp7: result.6 as Any, kp8: result.7 as Any, kp9: result.8 as Any]
+                },
+                accessors: [a1, a2, a3, a4, a5, a6, a7, a8, a9],
+                initialState: initialState.map { [kp1: $0.0 as Any, kp2: $0.1 as Any, kp3: $0.2 as Any, kp4: $0.3 as Any, kp5: $0.4 as Any, kp6: $0.5 as Any, kp7: $0.6 as Any, kp8: $0.7 as Any, kp9: $0.8 as Any] }
+            )
+        ]
+    }
+
+    // MARK: - Ten keyPath init
+
+    public init<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10>(
+        _ kp1: ReferenceWritableKeyPath<Base, T1>,
+        _ kp2: ReferenceWritableKeyPath<Base, T2>,
+        _ kp3: ReferenceWritableKeyPath<Base, T3>,
+        _ kp4: ReferenceWritableKeyPath<Base, T4>,
+        _ kp5: ReferenceWritableKeyPath<Base, T5>,
+        _ kp6: ReferenceWritableKeyPath<Base, T6>,
+        _ kp7: ReferenceWritableKeyPath<Base, T7>,
+        _ kp8: ReferenceWritableKeyPath<Base, T8>,
+        _ kp9: ReferenceWritableKeyPath<Base, T9>,
+        _ kp10: ReferenceWritableKeyPath<Base, T10>,
+        initialState: (T1, T2, T3, T4, T5, T6, T7, T8, T9, T10)? = nil,
+        transition: @escaping (Progress, Base, (T1, T2, T3, T4, T5, T6, T7, T8, T9, T10)) -> (T1, T2, T3, T4, T5, T6, T7, T8, T9, T10)
+    ) {
+        let a1 = PropertyAccessor(kp1)
+        let a2 = PropertyAccessor(kp2)
+        let a3 = PropertyAccessor(kp3)
+        let a4 = PropertyAccessor(kp4)
+        let a5 = PropertyAccessor(kp5)
+        let a6 = PropertyAccessor(kp6)
+        let a7 = PropertyAccessor(kp7)
+        let a8 = PropertyAccessor(kp8)
+        let a9 = PropertyAccessor(kp9)
+        let a10 = PropertyAccessor(kp10)
+        transitions = [
+            SingleTransition(
+                transition: Transition { progress, view, state in
+                    let v: (T1, T2, T3, T4, T5, T6, T7, T8, T9, T10)
+                    if let initial = initialState {
+                        v = initial
+                    } else if let v1 = state[kp1] as? T1, let v2 = state[kp2] as? T2, let v3 = state[kp3] as? T3, let v4 = state[kp4] as? T4, let v5 = state[kp5] as? T5, let v6 = state[kp6] as? T6, let v7 = state[kp7] as? T7, let v8 = state[kp8] as? T8, let v9 = state[kp9] as? T9, let v10 = state[kp10] as? T10 {
+                        v = (v1, v2, v3, v4, v5, v6, v7, v8, v9, v10)
+                    } else {
+                        v = (view[keyPath: kp1], view[keyPath: kp2], view[keyPath: kp3], view[keyPath: kp4], view[keyPath: kp5], view[keyPath: kp6], view[keyPath: kp7], view[keyPath: kp8], view[keyPath: kp9], view[keyPath: kp10])
+                    }
+                    let result = transition(progress, view, v)
+                    return [kp1: result.0 as Any, kp2: result.1 as Any, kp3: result.2 as Any, kp4: result.3 as Any, kp5: result.4 as Any, kp6: result.5 as Any, kp7: result.6 as Any, kp8: result.7 as Any, kp9: result.8 as Any, kp10: result.9 as Any]
+                },
+                accessors: [a1, a2, a3, a4, a5, a6, a7, a8, a9, a10],
+                initialState: initialState.map { [kp1: $0.0 as Any, kp2: $0.1 as Any, kp3: $0.2 as Any, kp4: $0.3 as Any, kp5: $0.4 as Any, kp6: $0.5 as Any, kp7: $0.6 as Any, kp8: $0.7 as Any, kp9: $0.8 as Any, kp10: $0.9 as Any] }
+            )
+        ]
+    }
+
+    // MARK: - Eleven keyPath init
+
+    public init<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11>(
+        _ kp1: ReferenceWritableKeyPath<Base, T1>,
+        _ kp2: ReferenceWritableKeyPath<Base, T2>,
+        _ kp3: ReferenceWritableKeyPath<Base, T3>,
+        _ kp4: ReferenceWritableKeyPath<Base, T4>,
+        _ kp5: ReferenceWritableKeyPath<Base, T5>,
+        _ kp6: ReferenceWritableKeyPath<Base, T6>,
+        _ kp7: ReferenceWritableKeyPath<Base, T7>,
+        _ kp8: ReferenceWritableKeyPath<Base, T8>,
+        _ kp9: ReferenceWritableKeyPath<Base, T9>,
+        _ kp10: ReferenceWritableKeyPath<Base, T10>,
+        _ kp11: ReferenceWritableKeyPath<Base, T11>,
+        initialState: (T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11)? = nil,
+        transition: @escaping (Progress, Base, (T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11)) -> (T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11)
+    ) {
+        let a1 = PropertyAccessor(kp1)
+        let a2 = PropertyAccessor(kp2)
+        let a3 = PropertyAccessor(kp3)
+        let a4 = PropertyAccessor(kp4)
+        let a5 = PropertyAccessor(kp5)
+        let a6 = PropertyAccessor(kp6)
+        let a7 = PropertyAccessor(kp7)
+        let a8 = PropertyAccessor(kp8)
+        let a9 = PropertyAccessor(kp9)
+        let a10 = PropertyAccessor(kp10)
+        let a11 = PropertyAccessor(kp11)
+        transitions = [
+            SingleTransition(
+                transition: Transition { progress, view, state in
+                    let v: (T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11)
+                    if let initial = initialState {
+                        v = initial
+                    } else if let v1 = state[kp1] as? T1, let v2 = state[kp2] as? T2, let v3 = state[kp3] as? T3, let v4 = state[kp4] as? T4, let v5 = state[kp5] as? T5, let v6 = state[kp6] as? T6, let v7 = state[kp7] as? T7, let v8 = state[kp8] as? T8, let v9 = state[kp9] as? T9, let v10 = state[kp10] as? T10, let v11 = state[kp11] as? T11 {
+                        v = (v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11)
+                    } else {
+                        v = (view[keyPath: kp1], view[keyPath: kp2], view[keyPath: kp3], view[keyPath: kp4], view[keyPath: kp5], view[keyPath: kp6], view[keyPath: kp7], view[keyPath: kp8], view[keyPath: kp9], view[keyPath: kp10], view[keyPath: kp11])
+                    }
+                    let result = transition(progress, view, v)
+                    return [kp1: result.0 as Any, kp2: result.1 as Any, kp3: result.2 as Any, kp4: result.3 as Any, kp5: result.4 as Any, kp6: result.5 as Any, kp7: result.6 as Any, kp8: result.7 as Any, kp9: result.8 as Any, kp10: result.9 as Any, kp11: result.10 as Any]
+                },
+                accessors: [a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11],
+                initialState: initialState.map { [kp1: $0.0 as Any, kp2: $0.1 as Any, kp3: $0.2 as Any, kp4: $0.3 as Any, kp5: $0.4 as Any, kp6: $0.5 as Any, kp7: $0.6 as Any, kp8: $0.7 as Any, kp9: $0.8 as Any, kp10: $0.9 as Any, kp11: $0.10 as Any] }
+            )
+        ]
+    }
+
+    // MARK: - Twelve keyPath init
+
+    public init<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12>(
+        _ kp1: ReferenceWritableKeyPath<Base, T1>,
+        _ kp2: ReferenceWritableKeyPath<Base, T2>,
+        _ kp3: ReferenceWritableKeyPath<Base, T3>,
+        _ kp4: ReferenceWritableKeyPath<Base, T4>,
+        _ kp5: ReferenceWritableKeyPath<Base, T5>,
+        _ kp6: ReferenceWritableKeyPath<Base, T6>,
+        _ kp7: ReferenceWritableKeyPath<Base, T7>,
+        _ kp8: ReferenceWritableKeyPath<Base, T8>,
+        _ kp9: ReferenceWritableKeyPath<Base, T9>,
+        _ kp10: ReferenceWritableKeyPath<Base, T10>,
+        _ kp11: ReferenceWritableKeyPath<Base, T11>,
+        _ kp12: ReferenceWritableKeyPath<Base, T12>,
+        initialState: (T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12)? = nil,
+        transition: @escaping (Progress, Base, (T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12)) -> (T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12)
+    ) {
+        let a1 = PropertyAccessor(kp1)
+        let a2 = PropertyAccessor(kp2)
+        let a3 = PropertyAccessor(kp3)
+        let a4 = PropertyAccessor(kp4)
+        let a5 = PropertyAccessor(kp5)
+        let a6 = PropertyAccessor(kp6)
+        let a7 = PropertyAccessor(kp7)
+        let a8 = PropertyAccessor(kp8)
+        let a9 = PropertyAccessor(kp9)
+        let a10 = PropertyAccessor(kp10)
+        let a11 = PropertyAccessor(kp11)
+        let a12 = PropertyAccessor(kp12)
+        transitions = [
+            SingleTransition(
+                transition: Transition { progress, view, state in
+                    let v: (T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12)
+                    if let initial = initialState {
+                        v = initial
+                    } else if let v1 = state[kp1] as? T1, let v2 = state[kp2] as? T2, let v3 = state[kp3] as? T3, let v4 = state[kp4] as? T4, let v5 = state[kp5] as? T5, let v6 = state[kp6] as? T6, let v7 = state[kp7] as? T7, let v8 = state[kp8] as? T8, let v9 = state[kp9] as? T9, let v10 = state[kp10] as? T10, let v11 = state[kp11] as? T11, let v12 = state[kp12] as? T12 {
+                        v = (v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12)
+                    } else {
+                        v = (view[keyPath: kp1], view[keyPath: kp2], view[keyPath: kp3], view[keyPath: kp4], view[keyPath: kp5], view[keyPath: kp6], view[keyPath: kp7], view[keyPath: kp8], view[keyPath: kp9], view[keyPath: kp10], view[keyPath: kp11], view[keyPath: kp12])
+                    }
+                    let result = transition(progress, view, v)
+                    return [kp1: result.0 as Any, kp2: result.1 as Any, kp3: result.2 as Any, kp4: result.3 as Any, kp5: result.4 as Any, kp6: result.5 as Any, kp7: result.6 as Any, kp8: result.7 as Any, kp9: result.8 as Any, kp10: result.9 as Any, kp11: result.10 as Any, kp12: result.11 as Any]
+                },
+                accessors: [a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12],
+                initialState: initialState.map { [kp1: $0.0 as Any, kp2: $0.1 as Any, kp3: $0.2 as Any, kp4: $0.3 as Any, kp5: $0.4 as Any, kp6: $0.5 as Any, kp7: $0.6 as Any, kp8: $0.7 as Any, kp9: $0.8 as Any, kp10: $0.9 as Any, kp11: $0.10 as Any, kp12: $0.11 as Any] }
+            )
+        ]
+    }
+
     // MARK: - TransitionModifier init (backward compat)
 
     public init<T: TransitionModifier>(
