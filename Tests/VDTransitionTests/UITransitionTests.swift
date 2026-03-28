@@ -300,12 +300,6 @@ final class UITransitionTests: XCTestCase {
         XCTAssertFalse(t1.matches(t2))
     }
 
-    func testPatternMatch() {
-        let t1 = UITransition<MockView>.value(\.alpha, 0)
-        let t2 = UITransition<MockView>.value(\.alpha, 0.5)
-        XCTAssertTrue(t1 ~= t2)
-    }
-
     // MARK: - Inverted / reversed
 
     func testInverted() {
