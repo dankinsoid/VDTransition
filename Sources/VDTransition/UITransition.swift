@@ -29,7 +29,7 @@ import Foundation
 /// ```
 public struct UITransition<Base>: ExpressibleByArrayLiteral {
 
-    var block: (_ progress: Progress, _ view: Base, _ state: [PartialKeyPath<Base>: Any]) -> [PartialKeyPath<Base>: Any]
+    var block: (_ direction: TransitionDirection, _ view: Base, _ state: [PartialKeyPath<Base>: Any]) -> [PartialKeyPath<Base>: Any]
     var accessors: [PropertyAccessor<Base>]
     var initialState: [PartialKeyPath<Base>: Any]?
 
@@ -48,7 +48,7 @@ public struct UITransition<Base>: ExpressibleByArrayLiteral {
     }
 
     private init(
-        block: @escaping (_ progress: Progress, _ view: Base, _ state: [PartialKeyPath<Base>: Any]) -> [PartialKeyPath<Base>: Any],
+        block: @escaping (_ direction: TransitionDirection, _ view: Base, _ state: [PartialKeyPath<Base>: Any]) -> [PartialKeyPath<Base>: Any],
         accessors: [PropertyAccessor<Base>],
         initialState: [PartialKeyPath<Base>: Any]?
     ) {
